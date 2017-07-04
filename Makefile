@@ -11,8 +11,14 @@ ROOTLIBS     := $(shell root-config --glibs) -lTreePlayer
 
 CPPFLAGS += -Iinclude
 CPPFLAGS +=  -Wall -O2 $(ROOTCFLAGS)
-CPPFLAGS += -DBELLE
-#CPPFLAGS += -DPDF
+
+# un comment if Belle II style is desired
+CPPFLAGS += -DBELLE     
+
+# uncomment if pdf figures are desired instead of png
+#CPPFLAGS += -DPDF     
+
+# uncomment if you want the systematic plots to be automatically produced
 #CPPFLAGS += -DPLOTSYSTEMATICS
 
 CFLAGS += -Wall
@@ -30,5 +36,3 @@ $(EXE): $(OBJ)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $< -o $@ 
 
-#clean:
-#	$(RM) $(OBJ)
