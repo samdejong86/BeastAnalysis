@@ -1,23 +1,3 @@
-/*
- *  This header has several utility functions
- */
-
-TString getSimBranchName(TString DataBranchName){
-
-  if(DataBranchName.Contains("HE3")){
-    return "HE3_rate";
-  }else if(DataBranchName.Contains("BGO")){
-    return "BGO_dose";
-  }else if(DataBranchName.Contains("CSI")){
-    return "CSI_dose";
-  }else if(DataBranchName.Contains("DIA")){
-    return "DIA_dose";
-  } else {
-    cout<<"Making a guess\n";
-    return DataBranchName;
-  }
-}
-
 //get the number of channels in a branch
 int getNumberOfChannels(TString DataBranchName, TString dataFile){
 
