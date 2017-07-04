@@ -18,6 +18,7 @@ TString getSimBranchName(TString DataBranchName){
   }
 }
 
+//get the number of channels in a branch
 int getNumberOfChannels(TString DataBranchName, TString dataFile){
 
   TFile *f = new TFile(dataFile);

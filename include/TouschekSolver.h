@@ -1,3 +1,11 @@
+/*
+ *  Perform the Touschek & beam gas fit to data. This fits the data branch to  R = A*I*P*Zeff^2+B*I^2/(sigma_y*NBunch)
+ *  methods are described in detail in .cc file in src/
+ *
+ *  by Sam de Jong
+ */
+
+
 #include "TMatrixD.h"
 #include "TString.h"
 #include "TF2.h"
@@ -13,8 +21,6 @@ using namespace std;
 #ifndef TOUSCHEK_h
 #define TOUSCHEK_h 1
 
-//#include "TouschekSolver.cc"
-
 class TouschekSolver{
 
  public:
@@ -23,17 +29,18 @@ class TouschekSolver{
   TouschekSolver(const TouschekSolver &obj);
   TouschekSolver(TString ring, TMatrixD y, TMatrixD err, TMatrixD x, bool isSim);
 
+  //set method
   void setVariables(TString ring, TMatrixD y, TMatrixD err, TMatrixD x, bool isSim);
-  void draw(TGraphErrors *data, TH1F *Coulomb, TH1F *Touschek);
   
+  //get methods
   TMatrixD getSoln(){return soln;}
   TMatrixD getAppliedSoln(){return appliedSoln;}
   TMatrixD getVariance() {return Var;}
-
   double getTousFitParameters(){return soln[1][0];}
   double getBGFitParameters(){return soln[0][0];}
   
   
+  void draw(TGraphErrors *data, TH1F *Coulomb, TH1F *Touschek);
   void Solve(double tousParam);
   void calculateVariance();
   double chiSq();  
@@ -42,7 +49,6 @@ class TouschekSolver{
   void PrintTitle(ostream & out) const;
 
   friend ostream& operator<<(ostream& os, const TouschekSolver& r);
-
 
 
  private:

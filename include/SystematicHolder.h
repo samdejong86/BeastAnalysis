@@ -1,3 +1,11 @@
+/*
+ *  This class holds the systematic errors for the analysis. It can print them to the console 
+ *  using cout<<SystematicHolder. It can also print an xml file.
+ *
+ *  by Sam de Jong
+ */
+
+
 using namespace std;
 
 
@@ -16,7 +24,7 @@ class SystematicHolder{
   
   }
   
-  
+  //print to console
   void printOn(ostream & out) const{
     
     out<<"------Systematic-Uncertainties------\n";
@@ -51,41 +59,42 @@ class SystematicHolder{
 
   }
 
+  //print to an xml file
   void xmlPrint(TString DataBranchName, TString filename) {
 
-    TString exists=gSystem->GetFromPipe("test -f "+filename+"; echo $?");
-    if(exists=="0") gROOT->ProcessLine(".! sed -i -e 's/<\\/xml>//g' "+filename);
+    TString exists=gSystem->GetFromPipe("test -f "+filename+"; echo $?");          //check if the file exists
+    if(exists=="0") gROOT->ProcessLine(".! sed -i -e 's/<\\/xml>//g' "+filename);  //remove the </xml> tag at the end of the file.
     
     ofstream out;
-    out.open(filename, ios::app);
-    if(exists!="0") out<<"<xml>"<<endl;
+    out.open(filename, ios::app);  //append to file
+    if(exists!="0") out<<"<xml>"<<endl;   //if the file doesn't exist, add <xml> tag
 
 
     for(int i=0; i<(int)name.size(); i++)
       name[i].ReplaceAll(" ", "_");
 
-    out<<"<"<<DataBranchName<<">"<<endl;
+    out<<"<"<<DataBranchName<<">"<<endl;                      //the start tag is <DetectorBranchName>
 
-    out<<"  <HER>"<<endl;
-    out<<"    <Touschek value=\""<<ValueTousHER<<"\">"<<endl;
+    out<<"  <HER>"<<endl;                                     //start of HER background components
+    out<<"    <Touschek value=\""<<ValueTousHER<<"\">"<<endl; //HER touschek
     for(int i=0; i<(int)name.size(); i++){
-      out<<"      <"<<name[i]<<">"<<endl;
+      out<<"      <"<<name[i]<<">"<<endl;                    //systematic name
 
-      out<<"        <up>"<<endl;
+      out<<"        <up>"<<endl;                             //up error
       out<<"          "<<HERupTous[i]<<endl;
       out<<"        </up>"<<endl;
 
-      out<<"        <down>"<<endl;
+      out<<"        <down>"<<endl;                           //down error
       out<<"          "<<HERdownTous[i]<<endl;
       out<<"        </down>"<<endl;
 
       out<<"      </"<<name[i]<<">"<<endl;
     }
-    out<<"    </Touschek>"<<endl;
+    out<<"    </Touschek>"<<endl;                            //end of HER touschek
 
-    out<<"    <Beam_Gas value=\""<<ValueBGHER<<"\">"<<endl;
+    out<<"    <Beam_Gas value=\""<<ValueBGHER<<"\">"<<endl;  //HER beam gas... (and so one)
     for(int i=0; i<(int)name.size(); i++){
-     out<<"      <"<<name[i]<<">"<<endl;
+     out<<"      <"<<name[i]<<">"<<endl; 
 
       out<<"        <up>"<<endl;
       out<<"          "<<HERupBG[i]<<endl;
@@ -98,9 +107,9 @@ class SystematicHolder{
       out<<"      </"<<name[i]<<">"<<endl;
     }
     out<<"    </Beam_Gas>"<<endl;
-    out<<"  </HER>"<<endl;
+    out<<"  </HER>"<<endl;                                   //end of HER
 
-    out<<"  <LER>"<<endl;
+    out<<"  <LER>"<<endl;                                    //start of LER
 
     out<<"    <Touschek value=\""<<ValueTousLER<<"\">"<<endl;
     for(int i=0; i<(int)name.size(); i++){
@@ -134,9 +143,9 @@ class SystematicHolder{
       out<<"      </"<<name[i]<<">"<<endl;
     }
     out<<"    </Beam_Gas>"<<endl;
-    out<<"  </LER>"<<endl;
+    out<<"  </LER>"<<endl;                   //end of LER
 
-    out<<"</"<<DataBranchName<<">"<<endl;
+    out<<"</"<<DataBranchName<<">"<<endl;    //end of detector tag
 
     out<<"</xml>"<<endl;
 
@@ -147,6 +156,7 @@ class SystematicHolder{
   }
 
   
+  //set the ratio values.
   void setData(dataSimRatio data){
     
    ValueTousHER = data.getHERTouschek(); 
@@ -156,27 +166,27 @@ class SystematicHolder{
    ValueBGLER = data.getLERBeamGas();
 
    
+   //add location uncertainty
    name.push_back("Location");
    LERupTous.push_back(data.getLERTouschekError());
    HERupTous.push_back(data.getHERTouschekError());
+   LERdownBG.push_back(data.getLERBeamGasError());
+   HERdownBG.push_back(data.getHERBeamGasError());
 
    LERdownTous.push_back(data.getLERTouschekError());
    HERdownTous.push_back(data.getHERTouschekError());
-
    LERupBG.push_back(data.getLERBeamGasError());
    HERupBG.push_back(data.getHERBeamGasError());
-   LERdownBG.push_back(data.getLERBeamGasError());
-   HERdownBG.push_back(data.getHERBeamGasError());
    
 
   }
 
-
-
+  //add an up systematic error. 
   void addSystematicUp(TString sysName, dataSimRatio data){
     bool found=false;
+    //search the name vector for the systematic
     for(int i=0; i<(int)name.size(); i++){
-      if(name[i]==sysName){
+      if(name[i]==sysName){   
 	found=true;
 	LERupTous[i] = data.getLERTouschek()-ValueTousLER;
 	HERupTous[i] = data.getHERTouschek()-ValueTousHER;
@@ -186,6 +196,7 @@ class SystematicHolder{
       }
     }
 
+    //if the systematic isn't found, add it to the vector
     if(!found){
       name.push_back(sysName);
       
@@ -195,6 +206,7 @@ class SystematicHolder{
       LERupBG.push_back(data.getLERBeamGas()-ValueBGLER);
       HERupBG.push_back(data.getHERBeamGas()-ValueBGHER);
 
+      //add an entry to the down vector as well
       LERdownTous.push_back(0);
       HERdownTous.push_back(0);
 	
@@ -204,6 +216,7 @@ class SystematicHolder{
   }
 
   
+//add a down systematic error.
 void addSystematicDown(TString sysName, dataSimRatio data){
     bool found=false;
     for(int i=0; i<(int)name.size(); i++){
@@ -239,32 +252,30 @@ void addSystematicDown(TString sysName, dataSimRatio data){
 
  private:
 
+  //the data/sim ratios
   double ValueTousLER;
   double ValueBGLER;
-
   double ValueTousHER;
   double ValueBGHER;
 
-  vector<TString> name;
+  vector<TString> name;  //systematuc names 
 
+  //LER uncertainties
   vector<double> LERupTous;
   vector<double> LERdownTous;
   vector<double> LERupBG;
   vector<double> LERdownBG;
 
+  //HER uncertainties
   vector<double> HERupTous;
   vector<double> HERdownTous;
   vector<double> HERupBG;
   vector<double> HERdownBG;
 
 
-
-
-
-
-
 };
 
+//overload of << operator
 ostream& operator<<(ostream& os, const SystematicHolder& H)  {  
   //os << dt.mo << '/' << dt.da << '/' << dt.yr;  
   H.printOn(os);

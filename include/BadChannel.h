@@ -15,7 +15,8 @@ vector<int> getBadChannels(TString &BranchName){
   TString bChannelList;
   vector<int> badChannels;
   badChannels.resize(nChannels);
-
+  
+  //The CSI channels are made up of LYSO and CSI detectors
   if(BranchName.Contains("LYSO")){
     for(int i=0; i<(int)badChannels.size(); i++)
       if(i%3==2) 
@@ -57,7 +58,7 @@ vector<int> getBadChannels(TString &BranchName){
 
 }
 
-
+//Some detectors have forward and backward components. Seperate them
 void forwardBackward(TString DataBranchName, TString &forwardOrBackward, vector<int> &badChannels){
 
   if(DataBranchName.Contains("HE3")){

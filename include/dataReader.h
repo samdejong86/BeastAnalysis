@@ -1,3 +1,12 @@
+/*
+ *   This class holds the data from a root file. Methods are described in detail in the .cc file in src/
+ *
+ * by Sam de Jong
+ *
+ */
+
+
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -24,8 +33,10 @@ class dataReader{
   dataReader(const dataReader &obj);
   dataReader(TString inFile, TString DataBranch, TString ring, int nch);
 
+  //set file name
   void setFile(TString inFile){inputFile=inFile;}
 
+  //get methods
   TMatrixD getYData(int ch){return ydata[ch];}
   TMatrixD getErrors(int ch){return errors[ch];}
   TMatrixD getX(){return X;}

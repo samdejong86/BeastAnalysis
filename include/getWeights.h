@@ -1,3 +1,8 @@
+/* 
+ *  A simple method which determines the weighting factors for the study
+ * 
+ *  by Sam de Jong
+ */
 
 double getWeights(vector<TouschekSolver> data, vector<TouschekSolver> Sim, double &error){
   

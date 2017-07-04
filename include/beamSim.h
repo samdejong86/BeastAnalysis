@@ -1,13 +1,20 @@
+/*
+ *  This class contains the simulation. It get the simulation parameters from the truth branch
+ *  of one of Igal's simulation ntuples, then scales them by the current, pressure, and beam size
+ *  from the data. Methods are described in detail in .cc file in src/
+ *
+ *  by Sam de Jong
+ *
+ */
+
+
+
 #include <iostream>
 #include <sstream>
 
 #include "TString.h"
 #include "TFile.h"
 #include "TTree.h"
-
-/*
- * This header gets the simulation parameters from the truth branch of the mc sample
- */
 
 using namespace std;
 
@@ -23,14 +30,17 @@ class beamSim{
   beamSim(const beamSim &obj);
   beamSim(TString file, TString DataBranch, int nCh);
  
+  //set methods
   void setPressureScaleLER(double scale){PressureScaleLER=scale;}
   void setPressureScaleHER(double scale){PressureScaleHER=scale;}
   void setFilename(TString file){ filename=file;}
+
+  //for running a perturbed simulation
   void setCurrentPerturbation(double perturbation){ currentPerturb=perturbation;}
   void setBeamSizePerturbation(double perturbation){ beamSizePerturb=perturbation;}
   void setPScalePerturbation(double perturbation){ PScalePerturb=perturbation;}
 
-
+  //get methods
   vector<double> getLT(){return ParamLT;}
   vector<double> getHT(){return ParamHT;}
   vector< vector<double> > getLBG() {return ParamLBGall;}

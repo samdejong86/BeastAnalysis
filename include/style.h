@@ -1,58 +1,15 @@
+/*
+ *  style settings. If the compiler tag BELLE is defined, the BELLE style will be used, otherwise my style is used
+ *
+ *  by Sam de Jong, also based on belleII root style.
+ */
+
 #include "TColor.h"
 #include "TStyle.h"
 
 
-#ifndef BELLE
+#ifdef BELLE
 
-TColor *CustomRed   = new TColor(1002, 210./256,  38./256,  48./256);
-TColor *CustomGreen = new TColor(1004,  90./256, 143./256,  41./256);
-TColor *CustomBlue  = new TColor(1003,  60./256, 125./256, 196./256);
-TColor *CustomBlue2  = new TColor(1005,  60./256, 125./256, 196./256);
-TColor *CustomGrey  = new TColor(1001,  43./256,  43./256,  43./256);
-
-void thisStyle(){
-
-  TStyle *WhiteBack = new TStyle("White", "White");
-  int icol=0;
-  WhiteBack->SetFrameFillColor(icol);
-  WhiteBack->SetCanvasColor(icol);
-  WhiteBack->SetFrameBorderMode(icol);
-  WhiteBack->SetCanvasBorderMode(icol);
-  WhiteBack->SetPadBorderMode(icol);
-  WhiteBack->SetPadColor(icol);
-  WhiteBack->SetStatColor(icol);
-
-  //makes title centered, borderless, and transparent when saved
-  WhiteBack->SetTitleX(0.3);
-  WhiteBack->SetTitleW(0.4);
-    
-  TColor *col10 = gROOT->GetColor(10); col10->SetAlpha(0.0);
-  WhiteBack->SetTitleFillColor(10);
-  WhiteBack->SetTitleBorderSize(0);
-
-  //WhiteBack->SetLabelFont(61);
-  //WhiteBack->SetTitleFont(63);
-
-  //hides stat box
-  WhiteBack->SetOptStat(0);
-
-  //adds ticks to the right and top
-  WhiteBack->SetPadTickY(1);
-  WhiteBack->SetPadTickX(1);
-  WhiteBack->SetPalette(1);
-
-
-  WhiteBack->SetPadGridX(true);
-  WhiteBack->SetPadGridY(true);
-
-
-
-  gROOT->SetStyle("White");
-  gROOT->ForceStyle();
-
-}
-
-#else
 
 TColor *BeastGray           =  new TColor(1001, 128./256, 128./256, 128./256);
 TColor *BeastJava           =  new TColor(1003,  0.258824, 0.67451 , 0.698039); //coulomb
@@ -147,6 +104,59 @@ void thisStyle(){
 
 
 }
+
+#else
+
+
+TColor *CustomRed   = new TColor(1002, 210./256,  38./256,  48./256);
+TColor *CustomGreen = new TColor(1004,  90./256, 143./256,  41./256);
+TColor *CustomBlue  = new TColor(1003,  60./256, 125./256, 196./256);
+TColor *CustomBlue2  = new TColor(1005,  60./256, 125./256, 196./256);
+TColor *CustomGrey  = new TColor(1001,  43./256,  43./256,  43./256);
+
+void thisStyle(){
+
+  TStyle *WhiteBack = new TStyle("White", "White");
+  int icol=0;
+  WhiteBack->SetFrameFillColor(icol);
+  WhiteBack->SetCanvasColor(icol);
+  WhiteBack->SetFrameBorderMode(icol);
+  WhiteBack->SetCanvasBorderMode(icol);
+  WhiteBack->SetPadBorderMode(icol);
+  WhiteBack->SetPadColor(icol);
+  WhiteBack->SetStatColor(icol);
+
+  //makes title centered, borderless, and transparent when saved
+  WhiteBack->SetTitleX(0.3);
+  WhiteBack->SetTitleW(0.4);
+    
+  TColor *col10 = gROOT->GetColor(10); col10->SetAlpha(0.0);
+  WhiteBack->SetTitleFillColor(10);
+  WhiteBack->SetTitleBorderSize(0);
+
+  //WhiteBack->SetLabelFont(61);
+  //WhiteBack->SetTitleFont(63);
+
+  //hides stat box
+  WhiteBack->SetOptStat(0);
+
+  //adds ticks to the right and top
+  WhiteBack->SetPadTickY(1);
+  WhiteBack->SetPadTickX(1);
+  WhiteBack->SetPalette(1);
+
+
+  WhiteBack->SetPadGridX(true);
+  WhiteBack->SetPadGridY(true);
+
+
+
+  gROOT->SetStyle("White");
+  gROOT->ForceStyle();
+
+}
+
+
 
 #endif
 

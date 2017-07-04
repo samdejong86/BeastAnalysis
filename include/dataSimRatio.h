@@ -1,3 +1,9 @@
+/*
+ *  This class contains and calculates the data/sim ratio for the analysis.
+ *
+ *  by Sam de Jong
+ */
+
 
 using namespace std;
 
@@ -11,23 +17,26 @@ class dataSimRatio{
     LERBeamGas=0;
 }
 
+  //set the ratio
   void setHERTouschek(double num){HERTouschek=num;}
   void setHERBeamGas(double num){HERBeamGas=num;}
   void setLERTouschek(double num){LERTouschek=num;}
   void setLERBeamGas(double num){LERBeamGas=num;}
 
+  //get the ratio
   double getHERTouschek(){return HERTouschek;}
   double getHERBeamGas(){return HERBeamGas;}
   double getLERTouschek(){return LERTouschek;}
   double getLERBeamGas(){return LERBeamGas;}
 
+  //get location error
   double getHERTouschekError(){return HERTouschekErr;}
   double getHERBeamGasError(){return HERBeamGasErr;}
   double getLERTouschekError(){return LERTouschekErr;}
   double getLERBeamGasError(){return LERBeamGasErr;}
 
 
-  
+  //calculate data/sim ratio for HER or LER
   void addRatios(vector<TouschekSolver> data, vector<TouschekSolver> Sim, TString Ring){
 
     int n=0;
@@ -36,7 +45,6 @@ class dataSimRatio{
 
     double meanBG = 0.0;
     double M2BG = 0.0;
-
 
     //calculate data/sim ratio for Touschek and beam-gas
     double beamGas=0;
@@ -53,6 +61,7 @@ class dataSimRatio{
       double x=dataTous/simTous;
       double y=dataBG/simBG;
       
+      //running stdev calculation
       n+=1;
       double deltaTou = x-meanTou;
       meanTou += deltaTou/n;
@@ -84,6 +93,7 @@ class dataSimRatio{
  
   }
 
+  //cout method
   void printOn(ostream & out) const{
 
     out<<"\n\n------------Results------------\n";
@@ -108,6 +118,7 @@ class dataSimRatio{
 
 };
 
+//overload of << operator
 ostream& operator<<(ostream& os, const dataSimRatio& H)  {  
   //os << dt.mo << '/' << dt.da << '/' << dt.yr;  
   H.printOn(os);

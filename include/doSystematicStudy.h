@@ -1,4 +1,8 @@
-
+/*
+ *  This method carries out the systematic study
+ *
+ *  by Sam de Jong
+ */
 
 
 void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &solnLER, SystematicHolder &Systematics, vector<TouschekSolver> &solnHER_sim, vector<TouschekSolver> &solnLER_sim, double PScaleHERErr, double PScaleLERErr){
@@ -10,18 +14,22 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
   TString DataBranchName = Params.getDataBranchName();
 
 
+  //loop over three systematics: current, beam size, and PScale
   for(int q=0; q<3; q++){
-
-    if(q==0){
-      Params.setCurrentPerturbation(0.03);  //0.03mA
-      Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", true);
+    
+    
+    if(q==0){ //perturb beam current up, then do the simulation
+      Params.setCurrentPerturbation(0.03);  //perturbation
+      Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", true);  //simulation
       Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", true);
-    }else if(q==1){
+
+    }else if(q==1){//perturb beam size up
        Params.setBeamSizePerturbation(0.0137);   
        Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", true);
        Params.setBeamSizePerturbation(0.0371);    
        Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", true);
-    }else if(q==2){
+
+    }else if(q==2){//perturb pscale up
       Params.setPScalePerturbation(PScaleLERErr);
       Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", true);
       Params.setPScalePerturbation(PScaleHERErr);
@@ -29,7 +37,7 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
     }
   
     
-    
+    //get the simulated data
     dataReader LERSystematic("rootFiles/LERtemp.root", DataBranchName, "LER", nC);
     dataReader HERSystematic("rootFiles/HERtemp.root", DataBranchName, "HER", nC);
     LERSystematic.readData();
@@ -41,35 +49,30 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
     solnHERSystematic.resize(nC);
     
 
+    //get the Touschek fit solution for each (good) channel
     for(int i=0; i<nC; i++){
       if(badCh[i]) continue;   
-      
-      
-      solnLERSystematic[i].setVariables("LER", LERSystematic.getYData(i), LERSystematic.getErrors(i), LERSystematic.getX(), true);
-      //solnLERSystematic[i].Solve(0);
- 
+            
+      solnLERSystematic[i].setVariables("LER", LERSystematic.getYData(i), LERSystematic.getErrors(i), LERSystematic.getX(), true); 
       solnLERSystematic[i].Solve(solnLER_sim[i].getTousFitParameters());
       
       solnHERSystematic[i].setVariables("HER", HERSystematic.getYData(i), HERSystematic.getErrors(i), HERSystematic.getX(), true);
-      //solnHERSystematic[i].Solve(0);
-
       solnHERSystematic[i].Solve(solnHER_sim[i].getTousFitParameters());
-      
-
-      
+            
     }
     
+    //get the data/sim ratio
     dataSimRatio ratios;
-
     ratios.addRatios(solnLER,solnLERSystematic, "LER");
     ratios.addRatios(solnHER,solnHERSystematic, "HER");
         
     
-
+    //delete the temporary files
     gROOT->ProcessLine(".! rm rootFiles/LERtemp.root");
     gROOT->ProcessLine(".! rm rootFiles/HERtemp.root");
     
 
+    //add the systematics to the SystematicHolder, then perform the down perturbation
     if(q==0){
       Systematics.addSystematicDown("Current", ratios);
       Params.setCurrentPerturbation(0.03);  //3mA
@@ -91,7 +94,7 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
     }
 
   
-
+    
     dataReader LERSystematic2("rootFiles/LERtemp.root", DataBranchName, "LER", nC);
     dataReader HERSystematic2("rootFiles/HERtemp.root", DataBranchName, "HER", nC);
     LERSystematic2.readData();
@@ -109,14 +112,10 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
     for(int i=0; i<nC; i++){
       if(badCh[i]) continue;   
       
-      
       solnLERSystematic[i].setVariables("LER", LERSystematic2.getYData(i), LERSystematic2.getErrors(i), LERSystematic2.getX(), true);
       solnLERSystematic[i].Solve(solnLER_sim[i].getTousFitParameters());
-      //solnLERSystematic[i].Solve(0);
-      
       
       solnHERSystematic[i].setVariables("HER", HERSystematic2.getYData(i), HERSystematic2.getErrors(i), HERSystematic2.getX(), true);
-      //solnHERSystematic[i].Solve(0);
       solnHERSystematic[i].Solve(solnHER_sim[i].getTousFitParameters());
       
       
@@ -126,7 +125,7 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
     ratios.addRatios(solnLER,solnLERSystematic, "LER");
     ratios.addRatios(solnHER,solnHERSystematic, "HER");
         
-    
+    //add the down systematic, then reset the perturbations.
     if(q==0){
       Systematics.addSystematicUp("Current", ratios);
       Params.setCurrentPerturbation(0);  //3mA
@@ -138,13 +137,11 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
       Params.setPScalePerturbation(0);
     }
 
+    //delete temporary files
     gROOT->ProcessLine(".! rm rootFiles/LERtemp.root");
     gROOT->ProcessLine(".! rm rootFiles/HERtemp.root");
 
   }
-
-
-
 
 
 }
