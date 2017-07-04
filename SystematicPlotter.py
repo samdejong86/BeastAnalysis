@@ -1,8 +1,9 @@
 
 # coding: utf-8
 
-# In[14]:
+# In[1]:
 
+#import relevant libraries
 import math
 import numpy as np
 import os
@@ -12,14 +13,17 @@ import seaborn as sns
 sns.set(style="ticks", palette="muted", color_codes=True)
 
 import xml.etree.ElementTree as ET
+
+#get the systematics xml file
 tree  = ET.parse('data/Systematics.xml')
 root = tree.getroot()
 
 import pandas as pd
 
 
-# In[7]:
+# In[2]:
 
+#set plot directory, make it if it doesn't exist
 PlotDir='figs/Results'
 
 if not os.path.exists(PlotDir):
@@ -33,6 +37,7 @@ show=True
 
 # In[ ]:
 
+# for use in batch mode
 if len(sys.argv) == 4:
     if int(sys.argv[1])==0:
         beast=False
@@ -41,13 +46,11 @@ if len(sys.argv) == 4:
     imageType=sys.argv[3]
 
 
-# In[8]:
+# In[3]:
 
-a=0.0
 
+#read the xml data into a pandas dataframe
 Data=[]
-
-
 for Detector in root:
     for Beam in Detector:
         for BGSource in Beam:
@@ -74,34 +77,37 @@ for Detector in root:
             Data.append([Beam.tag.replace('_', ' '), BGSource.tag.replace('_', ' '), Detector.tag.replace('_', ' '), value, math.sqrt(sumdown), math.sqrt(sumup)])
            
         
-                
+#create the dataframe                
 HERLER = pd.DataFrame(Data, columns=['Beam', 'Source', 'Detector', 'ratio', 'lowerror', 'uppererror'])
     
 
 
-# In[9]:
+# In[4]:
 
+#import matplotlib
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 
-
+#import the belle II style
 import belle2style_mpl
 style = belle2style_mpl.b2_style_mpl()  #style created by Michael Hedges to match BELLE II root style
 plt.style.use(style)
 
+#my colours
 TColor = "#5A8F29"
 GColor = "#3C7DC4"
 
-
+#the beast colours
 if beast:    
     TColor = "#CDAD2C"
     GColor = "#42ACB2"
 
 
-# In[10]:
+# In[5]:
 
+#the font I'm using doesn't have a character for ^-, so I have to redefine how the axis is labeled
 from matplotlib.ticker import FuncFormatter
 
 def labeller(x, pos):
@@ -109,18 +115,21 @@ def labeller(x, pos):
     
 
 
-# In[13]:
+# In[6]:
 
-
+#loop over the beams
 for beam in 'HER', 'LER':
     
     plt.figure(figsize=(800/80, 500/80))
 
     mainAx = plt.subplot(211)
     
+    #loop over Touschek and beam gas
     for source in 'Touschek', 'Beam Gas':
-        Frame=HERLER.loc[lambda df: (df.Beam == beam), :].loc[lambda df: (df.Source == source), :]
-            
+        #select approprate data from the data frame
+        Frame=HERLER.loc[lambda df: (df.Beam == beam), :].loc[lambda df: (df.Source == source), :] 
+        
+        #The Touschek plot is the top half, beam gas is the bottom half
         ThisColor=TColor
         xlabel=''
         if source == 'Touschek':
@@ -132,9 +141,10 @@ for beam in 'HER', 'LER':
             xlabel='Data/Sim ('+beam+')'            
             plt.setp(ax.get_xticklabels(), visible=True)
 
-        
+        #plot data
         sns.stripplot(Frame.ratio, Frame.Detector , jitter=False, size=10, color=ThisColor, linewidth=0)
 
+        #add error abrs
         for y,ylabel in zip(ax.get_yticks(), ax.get_yticklabels()):
             f = Frame['Detector'] == ylabel.get_text() 
             ax.errorbar(Frame.ratio[f].values, 
@@ -145,35 +155,36 @@ for beam in 'HER', 'LER':
                         capthick=2,
                         color=ThisColor)
 
-
+        #set axis titles
         plt.ylabel(source)
-   
         plt.xlabel(xlabel)
 
-    
+        #set log scale on x
         ax.set_xscale("log", nonposx='clip')
 
-    
+        #set ticks pointing in
         ax.tick_params(direction='in', pad=15)
         ax.tick_params(which='minor', direction='in', pad=15)
-        ax.grid(True)
-
-
-        gridlines = ax.get_xgridlines() + ax.get_ygridlines()
-        for line in gridlines:
-            line.set_linestyle('dotted')
-            line.set_color('black')
+        
+        #don't add grid if belle style is requested
+        if beast==False:
+            ax.grid(True)
+        
+            gridlines = ax.get_xgridlines() + ax.get_ygridlines()
+            for line in gridlines:
+                line.set_linestyle('dotted')
+                line.set_color('black')
     
         custom_formatter = FuncFormatter(labeller)
-
         ax.xaxis.set_major_formatter(custom_formatter)
     
         
         plt.tight_layout()
     
+    #save plot
     plt.savefig(PlotDir+'/'+beam+'RatioPlot.'+imageType)
               
-    
+    #show plot
     if show:
         sns.plt.show()
 
