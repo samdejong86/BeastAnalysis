@@ -325,6 +325,8 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   
   SystematicHolder Systematics;
   Systematics.setData(ratios);
+  Systematics.setPScale(PressureScaleHER, PressureScaleLER);
+  Systematics.setPScaleError(PScaleErrHER, PScaleErrLER);
 
   doSystematicStudy(solnHER, solnLER, Systematics, solnHER_sim, solnLER_sim, PScaleErrHER, PScaleErrLER);
   

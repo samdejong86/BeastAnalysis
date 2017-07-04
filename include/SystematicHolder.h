@@ -76,6 +76,9 @@ class SystematicHolder{
     out<<"<"<<DataBranchName<<">"<<endl;                      //the start tag is <DetectorBranchName>
 
     out<<"  <HER>"<<endl;                                     //start of HER background components
+    out<<"    <PScale value=\""<<PScaleH<<"\">"<<endl;
+    out<<"      "<<PScaleHEr<<endl;
+    out<<"    </PScale>"<<endl;
     out<<"    <Touschek value=\""<<ValueTousHER<<"\">"<<endl; //HER touschek
     for(int i=0; i<(int)name.size(); i++){
       out<<"      <"<<name[i]<<">"<<endl;                    //systematic name
@@ -110,7 +113,9 @@ class SystematicHolder{
     out<<"  </HER>"<<endl;                                   //end of HER
 
     out<<"  <LER>"<<endl;                                    //start of LER
-
+    out<<"    <PScale value=\""<<PScaleL<<"\">"<<endl;
+    out<<"      "<<PScaleLEr<<endl;
+    out<<"    </PScale>"<<endl;
     out<<"    <Touschek value=\""<<ValueTousLER<<"\">"<<endl;
     for(int i=0; i<(int)name.size(); i++){
     out<<"      <"<<name[i]<<">"<<endl;
@@ -178,7 +183,16 @@ class SystematicHolder{
    LERupBG.push_back(data.getLERBeamGasError());
    HERupBG.push_back(data.getHERBeamGasError());
    
+  }
 
+  void setPScale(double PScaleHER, double PScaleLER){
+    PScaleH=PScaleHER;
+    PScaleL=PScaleLER;
+  }
+
+  void setPScaleError(double PScaleHER, double PScaleLER){
+    PScaleHEr=PScaleHER;
+    PScaleLEr=PScaleLER;
   }
 
   //add an up systematic error. 
@@ -257,6 +271,12 @@ void addSystematicDown(TString sysName, dataSimRatio data){
   double ValueBGLER;
   double ValueTousHER;
   double ValueBGHER;
+
+  double PScaleH;
+  double PScaleL;
+
+  double PScaleHEr;
+  double PScaleLEr;
 
   vector<TString> name;  //systematuc names 
 
