@@ -47,6 +47,7 @@ vector<int> badCh;
 
 beamSim Params;
 int nC=1;
+XmlParser inputs;
 
 #include "BadChannel.h"
 #include "getWeights.h"
@@ -89,7 +90,7 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   gROOT->ProcessLine(".! "+CMD);
   gROOT->ProcessLine(".! mkdir -p rootFiles");
  
-  XmlParser inputs("data/inputs.xml");
+  inputs = XmlParser("data/inputs.xml");
 
 
   //location of data ntuples
@@ -324,5 +325,4 @@ int main(int argc,char** argv) {
  
   doIt(argv[1], argv[2]);
   
-  return 0
 }

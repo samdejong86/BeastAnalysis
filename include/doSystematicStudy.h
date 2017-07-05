@@ -7,8 +7,8 @@
 
 void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &solnLER, SystematicHolder &Systematics, vector<TouschekSolver> &solnHER_sim, vector<TouschekSolver> &solnLER_sim, double PScaleHERErr, double PScaleLERErr){
 
-  TString HERfile = "../../ntuples/v3/BEAST_run200789.root";
-  TString LERfile = "../../ntuples/v3/BEAST_run300789.root";
+  TString HERfile = inputs.getStringValue("HERfile");
+  TString LERfile = inputs.getStringValue("LERfile");
 
   int nC = Params.getNChannels();
   TString DataBranchName = Params.getDataBranchName();
