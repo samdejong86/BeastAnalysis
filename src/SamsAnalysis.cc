@@ -317,7 +317,11 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
 
 int main(int argc,char** argv) {
 
-   
+  if(argc<2){
+    cout<<"Usage:  SamsAnalysis BranchName forwardorbackward\n";
+    return 0;
+  }
+ 
   doIt(argv[1], argv[2]);
   
 
