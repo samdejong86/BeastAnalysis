@@ -4,4 +4,17 @@
 *.ipynb
 *.bak
 *.png
-*.pdf
+#*.pdf
+figs/*
+Systematics.xml
+
+# latex
+*_*.tex
+files.tex
+*.aux
+*.log
+*.nav
+*.out
+*.toc
+SamsAnalysis.pdf
+*.snm

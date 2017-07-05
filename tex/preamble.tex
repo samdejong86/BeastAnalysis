@@ -9,6 +9,8 @@
 \usepackage[latin1]{inputenc}
 \usepackage{times}
 \usepackage[T1]{fontenc}
+\usepackage{xstring}
+\usepackage{xparse}
 
 \definecolor{dgreen}{rgb}{0.,0.6,0.}
 
@@ -19,18 +21,10 @@
 \newcommand\smallfonfour{\fontsize{6pt}{8}\selectfont}
 \newcommand{\putat}[3]{\begin{picture}(0,0)(0,0)\put(#1,#2){#3}\end{picture}}
 
-\newcommand\PDFdir{/home/sam/Pictures/PDF/}
-\newcommand\PNGdir{/home/sam/Pictures/PNG/}
-
 \newcommand\up{$\uparrow$}
 \newcommand\down{$\downarrow$}
 
-\newcommand\SampleKey{
-\begin{tikzpicture}[remember picture,overlay]  
-  \node [xshift=2cm,yshift=-1.5cm] at (current page.north west)
-    {\includegraphics[height=1cm]{/home/sam/Pictures/SampleKey}};
-\end{tikzpicture}
-}
+
 
 
 
@@ -54,7 +48,7 @@
 
 \institute[University of Victoria] 
 {
-\includegraphics[height=0.5in]{/home/sam/Pictures/belle2-logo.pdf}\hspace{0.5cm}\includegraphics[height=0.5in]{/home/sam/Pictures/BeastLogo}\hspace{0.5cm}\includegraphics[height=0.5in]{/home/sam/Pictures/UVic_Logo}
+\includegraphics[height=0.5in]{img/belle2-logo.pdf}\hspace{0.5cm}\includegraphics[height=0.5in]{img/BeastLogo}\hspace{0.5cm}\includegraphics[height=0.5in]{img/UVic_Logo}
  
   Department of Physics and Astronomy\\
   University of Victoria

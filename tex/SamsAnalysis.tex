@@ -1,7 +1,5 @@
 \documentclass[xcolor=dvipsnames]{beamer}
 
-\usepackage{xstring}
-\usepackage{xparse}
 
 \newcommand\slideColor{Black}
 %OliveGreen for meetings with Dr Roney	
@@ -10,24 +8,16 @@
 %Black for Background meetings
 %RedOrange for UVic meetings
 
-\def\ReplaceStr#1{%
-  \IfSubStr{#1}{_}{%
-    \StrSubstitute{#1}{_}{}}{#1}}
 
-\newcommand\removeUnder[1]{
-	\normalexpandarg
-	\StrSubstitute{#1}{_}{ }
-	\StrBehind[3]{#1}{/}
-}
 
 
 \include{preamble}
 
 \title
-{TITLE HERE}
+{Simulation re-weighting scheme}
 
 \subtitle
-{SUBTITLE} 
+{applied to other BEAST II subdetectors} 
 
 \author[Samuel de Jong] 
 {Samuel ~de Jong}
@@ -37,9 +27,9 @@
 
 
 \date 
-{DATE}
+{\today}
 
-\subject{SUBJECT}
+\subject{BEAST II analysis}
 
 \input{files}
 
@@ -54,11 +44,11 @@
 \let\oldmacro\insertshorttitle%
 \renewcommand*\insertshorttitle{%
 \vspace{-0.05cm}
-\includegraphics[height=0.25cm]{/home/sam/Pictures/belle2-logo.pdf}
+\includegraphics[height=0.25cm]{img/belle2-logo.pdf}
 \hspace{0.15cm}
 \oldmacro% 
 \hspace{0.15cm}
-\includegraphics[height=0.25cm]{/home/sam/Pictures/UVic_Shield}
+\includegraphics[height=0.25cm]{img/UVic_Shield}
 %\hfill
 }
 
