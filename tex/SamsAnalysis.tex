@@ -59,63 +59,181 @@
 %\end{frame}
 
 %START OF TALK
+\section{Simulation weighting}
 
-\section{Introduction}
+\subsection{Initial weighting}
 
-
-
-
-
-
-\begin{frame}{Introduction}
-
-\end{frame}
-
-
-%\input{"HE3_rate"}
-
-\section{discussion}
-
-\begin{frame}{body of talk}
-
-
-\begin{columns}
-\column{2in}
-\centering
-\begin{figure}	
-	%\includegraphics[height=1.25in]{\PDFdir NoShield/HitLocations_ProdVert}
-\end{figure}
-
-\begin{figure}	
-	%\includegraphics[height=1.25in]{\PDFdir NoShield/Neutron_Flux}
-\end{figure}
-
-	
-\column{2in}
-\centering
-\begin{figure}	
-	%\includegraphics[height=1.25in]{\PDFdir NoShield/Crystal_Rad_Dose}
-\end{figure}
-
-\begin{figure}	
-	%\includegraphics[height=1.25in]{\PNGdir NoShield/Forward_Schematic}
-\end{figure}
-
-\end{columns}
-
-
-\end{frame}
-
-
-
-\section{Conclusion}
-
-\begin{frame}{Conclusion}
+\begin{frame}{Initial simulation weighting: beam gas}
 \begin{itemize}
 	\item
-	the end
+	The beam gas component was initial weighted:
+	\begin{itemize}
+		\item
+		$R_{BG}^{Scaled} = \sum _{i=1}^{12}(R^{Brems}_i+R^{Coulomb}_i)\cdot\frac{(I\cdot P_i)} {(I\cdot P)_{sim}}$
+	\end{itemize}
+	\item
+	Where the sum is over the 12 `D' sections where there is a pressure measurement.
+	\item
+	I modified this to include Z:
+	\begin{itemize}
+		\item
+		$R_{BG}^{Scaled} = \sum _{i=1}^{12}(R^{Brems}_i+R^{Coulomb}_i)\cdot\frac{(I\cdot P_i\cdot Z_{i}^{2})_{data}} {(I\cdot P\cdot Z^{2})_{sim}}$
+	\end{itemize}
+	\item
+	Where $Z_{sim}$=7, and $Z_{i}$ is Z measured in each `D' section if it is available. If it's not available, 2.7 is used for the LER, and 1 is used for the HER. 
 
 \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Initial simulation weighting: Touschek}
+\begin{itemize}
+	\item
+	The Touschek component is weighted:
+	\begin{itemize}
+		\item
+		$R_{Tous}^{Scaled} = R_{Tous}\cdot\frac{(I^{2}/N_{Bunch}\cdot\sigma_{y})_{data} }{(I^{2}/N_{Bunch}\cdot\sigma_{y})_{sim}}$	
+	\end{itemize}
+	\item
+	This remains unchanged in my analysis.
+	\item
+	The simulated rate is then:
+	\begin{itemize}
+		\item
+		$R_{Sim} = \left(R_{BG}^{Scaled}+R_{Tous}^{Scaled}\right)$
+	\end{itemize}
+		
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Fitting of data and simulation}
+\begin{itemize}
+	\item
+	Now that weighted simulation ntuples are produced, I do some analysis on them.
+	\item
+	I fit the data and simulation to this equation:
+	\begin{itemize}
+		\item
+		$R_{^{3}He\ tube} = c_{gas}\cdot P\cdot I\cdot Z^{2}+c_{T}\cdot \frac{I^{2}}{N_{Bunch}\cdot\sigma_{y}}$
+	\end{itemize}
+	\item
+	with Z=1 for the HER, and the measurment of Z from D02 is used for the LER.
+	\item
+	The average pressure in the whole ring is used in this fitting.
+
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Comments in initial result}
+\begin{itemize}
+	\item
+	There is large disagrement between data and simulation!
+	\item
+	We have been told there's a scaling factor of `3' on the pressure measurements, but I have no idea where this comes from or what the uncertainty is.
+	\item
+	Z is not 1 in the HER, but we have no way of knowing what it is, other than some measurements taken years ago
+
+\end{itemize}
+\end{frame}
+
+
+
+\subsection{Reweighting}
+
+\begin{frame}{Reweighting of simulation: beam-gas}
+\begin{itemize}
+	\item
+	Let's introduce a scale factor on the Pressure, called $P_{scale}$
+	\item
+	Now I rescale the beam-gas simulation by:
+	\begin{itemize}
+		\item
+		$R_{BG}^{Scaled} = \sum _{i=1}^{12}(R^{Brems}_i+R^{Coulomb}_i)\cdot\frac{P_{scale}(I\cdot P_i\cdot Z_{i}^{2})_{data}} {(I\cdot P\cdot Z^{2})_{sim}}$
+	\end{itemize}
+	\item
+	I choose $P_{scale}$ so that the ratio of Touschek to beam-gas is the same in data as in simulation:
+	\begin{itemize}
+		\item
+		$P_{scale} = \frac{(c_{gas}/c_{T})_{data}}{(c_{gas}/c_{T})_{sim}}$
+	\end{itemize}
+	\item
+	The Touschek weighting is not changed.
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{PScale: HER}
+\begin{figure}	
+	\includegraphics[height=2.5in]{../figs/Results/HERPScale}
+\end{figure}
+\end{frame}
+
+\begin{frame}{PScale: LER}
+\begin{figure}	
+	\includegraphics[height=2.5in]{../figs/Results/LERPScale}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Fitting of data and reweighted simulation}
+\begin{itemize}
+	\item
+	The data and simulation are fit to the same equation as before:
+	\begin{itemize}
+		\item
+		$R_{^{3}He\ tube} = c_{gas}\cdot P\cdot I\cdot Z^{2}+c_{T}\cdot \frac{I^{2}}{N_{Bunch}\cdot\sigma_{y}}$
+	\end{itemize}
+	\item
+	with Z=1 for the HER, and the measurment of Z from D02 is used for the LER.
+	\item
+	The average pressure in the whole ring is used in this fitting.
+
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Some interpretation}
+\begin{itemize}
+	\item
+	The simulation looks a lot better now.
+	\item
+	The data and simulated rates are not equal to each other, but that's not a problem.
+	\item
+	$P_{scale}$ has very different values for the HER and LER:
+	\begin{itemize}
+		\item
+		In the LER, Z is known, so $P_{scale}$ is just a scale in pressure
+		\item
+		In the HER, Z is not known, so $P_{scale}$ should really be called $P_{scale}Z^2$
+	\end{itemize}	
+	\item
+	This analysis is discussed in Section 8.2 of my thesis: \href{https://www.dropbox.com/s/jji6kuvv6u854s7/mainthesisUVIC.pdf?dl=0}{\color{blue}{Dropbox link}}
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Data - simulation comparison}
+\begin{itemize}
+	\item
+	Define a ratio of data to simulation:
+	\\ \Large
+	$(D/S)_{gas} = c_{gas}^{data}/c_{gas}^{sim}$\\ \vspace{0.25cm}
+	$(D/S)_{T} = c_{T}^{data}/c_{T}^{sim}$\\
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Data/Sim: HER}
+\begin{figure}	
+	\includegraphics[height=2.5in]{../figs/Results/HERRatioPlot}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Data/Sim: LER}
+\begin{figure}	
+	\includegraphics[height=2.5in]{../figs/Results/LERRatioPlot}
+\end{figure}
 \end{frame}
 
 \appendix
@@ -124,7 +242,15 @@
 
 \begin{frame}
 \begin{center}
-\Huge Backup slides
+\Huge Fitting results
+\vspace{0.5cm}
+\normalsize
+\begin{itemize}
+	\item
+	On the graph slides, click on the slide title to go to a table with the fit values.
+	\item
+	On the table slides, click on a channel number to go to the associated graph.
+\end{itemize}
 \end{center}
 \end{frame}
 
