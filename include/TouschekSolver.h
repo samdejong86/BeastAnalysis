@@ -48,6 +48,8 @@ class TouschekSolver{
   void printSoln(ostream & out) const;
   void PrintTitle(ostream & out) const;
 
+  void printSolnTex(ostream & out) const;
+
   friend ostream& operator<<(ostream& os, const TouschekSolver& r);
 
 

@@ -70,7 +70,7 @@ void forwardBackward(TString DataBranchName, TString &forwardOrBackward, vector<
 
   int num=64;
   if(DataBranchName.Contains("CSI")) num=9;
-  if(DataBranchName.Contains("BGO")) num=4;
+  if(DataBranchName.Contains("BGO")) num=3;
 
   
   bool forward=false;

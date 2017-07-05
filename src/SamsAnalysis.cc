@@ -50,7 +50,7 @@ int nC=1;
 #include "BadChannel.h"
 #include "getWeights.h"
 #include "doSystematicStudy.h"  
-
+#include "Print.h"
 
 void doIt(TString DataBranchName, TString forwardOrBackward = ""){
 
@@ -172,19 +172,19 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
 
     //draw solution and save to file
     solnLER[i].draw(dataLER.getGraph(i),histCouLER, histTouLER);
-    TString imageFileLER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_LER_Data_"+ch;
+    TString imageFileLER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_LER_Data-"+ch;
     c1->Print(imageFileLER+"."+imageType);
 
     solnHER[i].draw(dataHER.getGraph(i),histCouHER, histTouHER);
-    TString imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_Data_"+ch;
+    TString imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_Data-"+ch;
     c1->Print(imageFileHER+"."+imageType);
 
     solnLER_sim[i].draw(simLER.getGraph(i),histCouLER, histTouLER);
-    imageFileLER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_LER_Initial_Simulation_"+ch;
+    imageFileLER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_LER_Initial_Simulation-"+ch;
     c1->Print(imageFileLER+"."+imageType);
 
     solnHER_sim[i].draw(simHER.getGraph(i),histCouHER, histTouHER);
-    imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_Initial_Simulation_"+ch;
+    imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_Initial_Simulation-"+ch;
     c1->Print(imageFileHER+"."+imageType);
 
 
@@ -240,68 +240,33 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
     ss.str("");
 
     solnLER_reSim[i].draw(reSimLER.getGraph(i),histCouHER, histTouHER);
-    TString imageFileLER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_LER_ReWeighted_Simulation_"+ch;
+    TString imageFileLER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_LER_ReWeighted_Simulation-"+ch;
     c1->Print(imageFileLER+"."+imageType);
 
     solnHER_reSim[i].draw(reSimHER.getGraph(i),histCouHER, histTouHER);
-    TString imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_ReWeighted_Simulation_"+ch;
+    TString imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_ReWeighted_Simulation-"+ch;
     c1->Print(imageFileHER+"."+imageType); 
 
 
   }
  
-  //print results
-  cout<<"\n\n-----------------------------------------LER-----------------------------------------\n";
-  cout<<"data\n";
-  cout<<right<<setw(8)<<"Channel";
-  solnLER[0].PrintTitle(cout);
-  for(int i=0; i<nC; i++){
-    if(badCh[i]) continue;
-    cout<<right<<setw(8)<<i<<solnLER[i]<<endl;
-  }
-  cout<<endl;
-  cout<<"initial sim\n";
-  cout<<right<<setw(8)<<"Channel";
-  solnLER[0].PrintTitle(cout);
-  for(int i=0; i<nC; i++){
-    if(badCh[i]) continue;
-    cout<<right<<setw(8)<<i<<solnLER_sim[i]<<endl;
-  }
-  cout<<endl;
-  cout<<"reweighted sim\n";
-  cout<<right<<setw(8)<<"Channel";
-  solnLER[0].PrintTitle(cout);
-  for(int i=0; i<nC; i++){
-    if(badCh[i]) continue;
-    cout<<right<<setw(8)<<i<<solnLER_reSim[i]<<endl;
-  } 
+  
 
+  //print results
 
   cout<<"\n\n-----------------------------------------HER-----------------------------------------\n";
-  cout<<"data\n";
-  cout<<right<<setw(8)<<"Channel";
-  solnLER[0].PrintTitle(cout);
-  for(int i=0; i<nC; i++){
-    if(badCh[i]) continue;
-    cout<<right<<setw(8)<<i<<solnHER.at(i)<<endl;
-  }
-  cout<<endl;
-  cout<<"initial sim\n";
-  cout<<right<<setw(8)<<"Channel";
-  solnLER[0].PrintTitle(cout);
-  for(int i=0; i<nC; i++){
-    if(badCh[i]) continue;
-    cout<<right<<setw(8)<<i<<solnHER_sim[i]<<endl;  
-  }
-  cout<<endl;
-  cout<<"reweighted sim\n";
-  cout<<right<<setw(8)<<"Channel";
-  solnLER[0].PrintTitle(cout);
-  for(int i=0; i<nC; i++){
-    if(badCh[i]) continue;
-    cout<<right<<setw(8)<<i<<solnHER_reSim[i]<<endl;
-  }
+  Print(solnHER, inputBranchName+forwardOrBackward, "HER", "Data");
+  Print(solnHER_sim, inputBranchName+forwardOrBackward, "HER", "Initial Simulation");
+  Print(solnHER_reSim, inputBranchName+forwardOrBackward, "HER", "ReWeighted Simulation");
 
+
+  cout<<"\n\n-----------------------------------------LER-----------------------------------------\n";
+  Print(solnLER, inputBranchName+forwardOrBackward, "LER", "Data");
+  Print(solnLER_sim, inputBranchName+forwardOrBackward, "LER", "Initial Simulation");
+  Print(solnLER_reSim, inputBranchName+forwardOrBackward, "LER", "ReWeighted Simulation");
+
+
+  
   //4) fit the re-weighted simulation and get data/sim ratios for beam gas and Tousckek for HER and LER
   dataSimRatio ratios;
 

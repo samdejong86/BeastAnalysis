@@ -234,6 +234,15 @@ void TouschekSolver::printSoln(ostream & out) const{
   out<<right<<setw(13)<<soln[0][0]<<right<<setw(16)<<sqrt(Var[0][0])<<right<<setw(16)<<soln[1][0]<<right<<setw(16)<<sqrt(Var[1][1])<<right<<setw(11)<<chiSquare<<right<<setw(5)<<ndof;
 
 }
+
+
+
+//print fit data
+void TouschekSolver::printSolnTex(ostream & out) const{
+  out<<soln[0][0]<<"&"<<sqrt(Var[0][0])<<"&"<<soln[1][0]<<"&"<<sqrt(Var[1][1])<<"&"<<chiSquare<<"&"<<ndof<<"\\\\"<<endl;
+}
+
+
   
 //overload of << operator
 ostream& operator<<(ostream& os, const TouschekSolver& r) {

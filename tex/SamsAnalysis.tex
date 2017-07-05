@@ -1,0 +1,166 @@
+\documentclass[xcolor=dvipsnames]{beamer}
+
+\usepackage{xstring}
+\usepackage{xparse}
+
+\newcommand\slideColor{Black}
+%OliveGreen for meetings with Dr Roney	
+%Mahogany for ECL meetings
+%MidnightBlue for Beast meetings
+%Black for Background meetings
+%RedOrange for UVic meetings
+
+\def\ReplaceStr#1{%
+  \IfSubStr{#1}{_}{%
+    \StrSubstitute{#1}{_}{}}{#1}}
+
+\newcommand\removeUnder[1]{
+	\normalexpandarg
+	\StrSubstitute{#1}{_}{ }
+	\StrBehind[3]{#1}{/}
+}
+
+
+\include{preamble}
+
+\title
+{TITLE HERE}
+
+\subtitle
+{SUBTITLE} 
+
+\author[Samuel de Jong] 
+{Samuel ~de Jong}
+
+%uncomment for meetings with mike
+%\institute[University of Victoria] 
+
+
+\date 
+{DATE}
+
+\subject{SUBJECT}
+
+\input{files}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+
+\end{frame}
+
+\newcommand*\oldmacro{}%
+\let\oldmacro\insertshorttitle%
+\renewcommand*\insertshorttitle{%
+\vspace{-0.05cm}
+\includegraphics[height=0.25cm]{/home/sam/Pictures/belle2-logo.pdf}
+\hspace{0.15cm}
+\oldmacro% 
+\hspace{0.15cm}
+\includegraphics[height=0.25cm]{/home/sam/Pictures/UVic_Shield}
+%\hfill
+}
+
+%\begin{frame}{Outline}
+
+  %\tableofcontents
+  % You might wish to add the option [pausesections]
+%\end{frame}
+
+%START OF TALK
+
+\section{Introduction}
+
+
+
+
+
+
+\begin{frame}{Introduction}
+
+\end{frame}
+
+
+%\input{"HE3_rate"}
+
+\section{discussion}
+
+\begin{frame}{body of talk}
+
+
+\begin{columns}
+\column{2in}
+\centering
+\begin{figure}	
+	%\includegraphics[height=1.25in]{\PDFdir NoShield/HitLocations_ProdVert}
+\end{figure}
+
+\begin{figure}	
+	%\includegraphics[height=1.25in]{\PDFdir NoShield/Neutron_Flux}
+\end{figure}
+
+	
+\column{2in}
+\centering
+\begin{figure}	
+	%\includegraphics[height=1.25in]{\PDFdir NoShield/Crystal_Rad_Dose}
+\end{figure}
+
+\begin{figure}	
+	%\includegraphics[height=1.25in]{\PNGdir NoShield/Forward_Schematic}
+\end{figure}
+
+\end{columns}
+
+
+\end{frame}
+
+
+
+\section{Conclusion}
+
+\begin{frame}{Conclusion}
+\begin{itemize}
+	\item
+	the end
+
+\end{itemize}
+\end{frame}
+
+\appendix
+\backupbegin
+%Backup slides here
+
+\begin{frame}
+\begin{center}
+\Huge Backup slides
+\end{center}
+\end{frame}
+
+
+\foreach \c in \ListOfFiles {
+	\IfSubStr{\c}{/}{	
+
+		\expandarg
+		\StrBehind[3]{\c}{/}[\temp]          
+		\StrBefore[1]{\temp}{-}[\tempt]
+
+		\begin{frame}{\hyperlink{\tempt}{\StrSubstitute{\temp}{_}{ }}}
+		\label{\temp}
+		\begin{figure}	
+			\includegraphics[height=3in]{"\c"}
+		\end{figure}
+
+		\end{frame}
+	}{
+		\input{\c}
+	}
+}
+
+
+\backupend
+
+\end{document}
+
+
