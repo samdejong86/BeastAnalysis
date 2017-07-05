@@ -324,5 +324,5 @@ int main(int argc,char** argv) {
  
   doIt(argv[1], argv[2]);
   
-
+  return 0
 }
