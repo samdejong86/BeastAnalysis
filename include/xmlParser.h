@@ -1,3 +1,9 @@
+/*
+ *  A simple class that parses an xml file
+ *
+ *  by Sam de Jong
+ */
+
 #include <iostream>
 #include <vector>
 #include <string>
