@@ -8,6 +8,7 @@
 using namespace std;
 
 #include "dataReader.h"
+#include "xmlParser.h"
 
 //copy constructor
 dataReader::dataReader(const dataReader &obj){
@@ -99,20 +100,29 @@ void dataReader::readRunTimes(){
     subrunStart.clear();
     subrunEnd.clear();
 
-    ifstream InFile; 
-    InFile.open("data/"+Ring+"SubRunTimes.dat");
+    XmlParser inputs("data/inputs.xml");
+    
+    string R="HER";
+    if(Ring=="LER") R="LER";
+    
+    string startTag=R+"SubRunStartTimes";
+    string endTag=R+"SubRunEndTimes";
 
-    while(!InFile.eof()){
-      //for(int i=0; i<nSubRun; i++){
-      UInt_t a, b;
-      InFile>>a;
-      if(a==5) break;
-      InFile>>b;
-      subrunStart.push_back(a);
-      subrunEnd.push_back(b);
-      
+    TString Start = inputs.getStringValue(startTag);
+    TString End = inputs.getStringValue(endTag);
+
+    int from=0;
+    TString tok;
+    
+    while(Start.Tokenize(tok, from, "[,]")){
+      double s = tok.Atoi();
+      subrunStart.push_back(s);
     }
-    InFile.close();
+    from=0;
+    while(End.Tokenize(tok, from, "[,]")){
+      double e = tok.Atoi();
+      subrunEnd.push_back(e);
+    }
     
     nSubRun=subrunStart.size();
 

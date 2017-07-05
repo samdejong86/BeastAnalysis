@@ -43,6 +43,7 @@ vector<int> badCh;
 #include "style.h"
 #include "dataSimRatio.h"
 #include "SystematicHolder.h"
+#include "xmlParser.h"
 
 beamSim Params;
 int nC=1;
@@ -88,9 +89,12 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   gROOT->ProcessLine(".! "+CMD);
   gROOT->ProcessLine(".! mkdir -p rootFiles");
  
+  XmlParser inputs("data/inputs.xml");
+
+
   //location of data ntuples
-  TString HERfile = "../../ntuples/v3/BEAST_run200789.root";
-  TString LERfile = "../../ntuples/v3/BEAST_run300789.root";
+  TString HERfile = inputs.getStringValue("HERfile");
+  TString LERfile = inputs.getStringValue("LERfile");
 
   //determine the number of channels in this detector
   nC = getNumberOfChannels(DataBranchName, LERfile);
@@ -98,14 +102,12 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   //-------------1) Initial weighting of simulation-------------
 
   //get simulation parameters
-  Params = beamSim("../../ntuples/Sim_v3/mc_beast_run_2005.root", DataBranchName,  nC);
+  Params = beamSim(inputs.getStringValue("SimulationReference"), DataBranchName,  nC);
   Params.getSimBeamPars();
 
   //perform scaling of simulation
   Params.Simulate(LERfile, "rootFiles/mc_Initial_LER_"+DataBranchName+".root");
   Params.Simulate(HERfile, "rootFiles/mc_Initial_HER_"+DataBranchName+".root");
-
-  
 
   //-------------2) Fit the beam-gas and Touschek componets of data and simulation-------------
 
