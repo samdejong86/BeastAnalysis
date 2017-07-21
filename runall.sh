@@ -1,8 +1,9 @@
 rm data/Systematics.xml
 rm tex/*_*.tex
+rm -r figs/*
 
 ./SamsAnalysis LYSO_hitRate forward
-./SamsAnalysis CSI_Doped_hitRate forward
+./SamsAnalysis CSI_Pure_hitRate forward
 
 ./SamsAnalysis BGO_dose forward
 ./SamsAnalysis BGO_dose backward
