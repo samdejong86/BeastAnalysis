@@ -271,12 +271,17 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
 
   
   //4) fit the re-weighted simulation and get data/sim ratios for beam gas and Tousckek for HER and LER
-  dataSimRatio ratios;
+  vector<dataSimRatio> ratios;
+  ratios.resize(nC);
 
 
-  ratios.addRatios(solnLER, solnLER_reSim, "LER");
-  ratios.addRatios(solnHER, solnHER_reSim, "HER");
-
+  //ratios.addRatios(solnLER, solnLER_reSim, "LER");
+  //ratios.addRatios(solnHER, solnHER_reSim, "HER");
+  for(int i=0; i<nC; i++){
+    if(badCh[i]) continue;       
+    ratios[i].addRatios(dataLER.getGraph(i), reSimLER.getGraph(i), "LER");
+    ratios[i].addRatios(dataHER.getGraph(i), reSimHER.getGraph(i), "HER");
+  }
 
   cout<<"\n\n----Reweighting-Factors----\n";
   cout<<"PscaleZ^2 for HER: ";
@@ -284,24 +289,38 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   cout<<"Pscale    for LER: ";
   cout<<PressureScaleLER<<"+/-"<<PScaleErrLER<<endl;
 
-  cout<<ratios;
+  cout<<"\n\n------------Results------------\n";
+  cout<<"HER\tLER\n";
+  for(int i=0; i<nC; i++){
+    if(badCh[i]) continue;        
+    cout<<ratios[i];
+  }
 
-
- 
+  
   //------------------Systematics------------------
   
   
-  SystematicHolder Systematics;
-  Systematics.setData(ratios);
-  Systematics.setPScale(PressureScaleHER, PressureScaleLER);
-  Systematics.setPScaleError(PScaleErrHER, PScaleErrLER);
+  vector<SystematicHolder> Systematics;
+  Systematics.resize(nC);
+  
+  for(int i=0; i<nC; i++){
+    if(badCh[i]) continue;    
+    Systematics[i].setData(ratios[i]);
+    Systematics[i].setPScale(PressureScaleHER, PressureScaleLER);
+    Systematics[i].setPScaleError(PScaleErrHER, PScaleErrLER);
 
-  doSystematicStudy(solnHER, solnLER, Systematics, solnHER_sim, solnLER_sim, PScaleErrHER, PScaleErrLER);
+  }
+
+  doSystematicStudy(Systematics, PScaleErrHER, PScaleErrLER);
   
   //print systematic uncertainties to console
   cout<<endl<<endl;
-  cout<<Systematics;
+  for(int i=0; i<nC; i++){
+    if(badCh[i]) continue;    
+    cout<<i<<"\t"<<Systematics[i];
+  }
 
+  /*
   //print systematics in xml file
   TString filename = "data/Systematics.xml";
   Systematics.xmlPrint(inputBranchName+forwardOrBackward, filename);
@@ -312,6 +331,7 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   TString command = "python SystematicPlotter.py "+belle+" 0 "+imageType;
   gROOT->ProcessLine(".! "+command);
   #endif
+  */
 
   		     
 }

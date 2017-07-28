@@ -5,13 +5,21 @@
  */
 
 
-void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &solnLER, SystematicHolder &Systematics, vector<TouschekSolver> &solnHER_sim, vector<TouschekSolver> &solnLER_sim, double PScaleHERErr, double PScaleLERErr){
+void doSystematicStudy(vector<SystematicHolder> &Systematics, double PScaleHERErr, double PScaleLERErr){
 
   TString HERfile = inputs.getStringValue("HERfile");
   TString LERfile = inputs.getStringValue("LERfile");
 
   int nC = Params.getNChannels();
   TString DataBranchName = Params.getDataBranchName();
+
+  //get data
+  dataReader LER(LERfile, DataBranchName, "LER", nC);
+  dataReader HER(HERfile, DataBranchName, "HER", nC);
+  LER.readData();
+  HER.readData();
+
+
 
 
   //loop over three systematics: current, beam size, and PScale
@@ -43,29 +51,15 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
     LERSystematic.readData();
     HERSystematic.readData();
     
-    vector<TouschekSolver> solnLERSystematic;
-    vector<TouschekSolver> solnHERSystematic;
-    solnLERSystematic.resize(nC);
-    solnHERSystematic.resize(nC);
-    
-
-    //get the Touschek fit solution for each (good) channel
-    for(int i=0; i<nC; i++){
-      if(badCh[i]) continue;   
-            
-      solnLERSystematic[i].setVariables("LER", LERSystematic.getYData(i), LERSystematic.getErrors(i), LERSystematic.getX(), true); 
-      solnLERSystematic[i].Solve(solnLER_sim[i].getTousFitParameters());
-      
-      solnHERSystematic[i].setVariables("HER", HERSystematic.getYData(i), HERSystematic.getErrors(i), HERSystematic.getX(), true);
-      solnHERSystematic[i].Solve(solnHER_sim[i].getTousFitParameters());
-            
-    }
-    
     //get the data/sim ratio
-    dataSimRatio ratios;
-    ratios.addRatios(solnLER,solnLERSystematic, "LER");
-    ratios.addRatios(solnHER,solnHERSystematic, "HER");
-        
+    vector<dataSimRatio> ratios;
+    ratios.resize(nC);
+    
+    for(int i=0; i<nC; i++){
+      if(badCh[i]) continue;    
+      ratios[i].addRatios(LER.getGraph(i), LERSystematic.getGraph(i), "LER");
+      ratios[i].addRatios(HER.getGraph(i), HERSystematic.getGraph(i), "HER");
+    }
     
     //delete the temporary files
     gROOT->ProcessLine(".! rm rootFiles/LERtemp.root");
@@ -74,19 +68,28 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
 
     //add the systematics to the SystematicHolder, then perform the down perturbation
     if(q==0){
-      Systematics.addSystematicDown("Current", ratios);
+      for(int i=0; i<nC; i++){
+	if(badCh[i]) continue;     
+	Systematics[i].addSystematicDown("Current", ratios[i]);
+      }
       Params.setCurrentPerturbation(0.03);  //3mA
       Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", false);
       Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", false);
     }else if(q==1){
-      Systematics.addSystematicDown("Beam Size", ratios);
+      for(int i=0; i<nC; i++){
+	if(badCh[i]) continue;  
+	Systematics[i].addSystematicDown("Beam Size", ratios[i]);
+      }
       Params.setBeamSizePerturbation(0.0137);   
       Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", false);
       Params.setBeamSizePerturbation(0.0371);    
       Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", false);
       
     }else if(q==2){
-      Systematics.addSystematicDown("PScale", ratios);
+      for(int i=0; i<nC; i++){
+	if(badCh[i]) continue;  
+	Systematics[i].addSystematicDown("PScale", ratios[i]);
+      }
       Params.setPScalePerturbation(PScaleLERErr);
       Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", false);
       Params.setPScalePerturbation(PScaleHERErr);
@@ -101,39 +104,34 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
     HERSystematic2.readData();
     
 
-
-    solnLERSystematic.clear();
-    solnHERSystematic.clear();
-    solnLERSystematic.resize(nC);
-    solnHERSystematic.resize(nC);
-
-
-  
+    ratios.clear();
+    ratios.resize(nC);
+    
     for(int i=0; i<nC; i++){
-      if(badCh[i]) continue;   
-      
-      solnLERSystematic[i].setVariables("LER", LERSystematic2.getYData(i), LERSystematic2.getErrors(i), LERSystematic2.getX(), true);
-      solnLERSystematic[i].Solve(solnLER_sim[i].getTousFitParameters());
-      
-      solnHERSystematic[i].setVariables("HER", HERSystematic2.getYData(i), HERSystematic2.getErrors(i), HERSystematic2.getX(), true);
-      solnHERSystematic[i].Solve(solnHER_sim[i].getTousFitParameters());
-      
-      
-      
+      if(badCh[i]) continue;          
+      ratios[i].addRatios(LER.getGraph(i), LERSystematic.getGraph(i), "LER");
+      ratios[i].addRatios(HER.getGraph(i), HERSystematic.getGraph(i), "HER");
     }
     
-    ratios.addRatios(solnLER,solnLERSystematic, "LER");
-    ratios.addRatios(solnHER,solnHERSystematic, "HER");
         
     //add the down systematic, then reset the perturbations.
     if(q==0){
-      Systematics.addSystematicUp("Current", ratios);
+      for(int i=0; i<nC; i++){
+	if(badCh[i]) continue;     
+	Systematics[i].addSystematicUp("Current", ratios[i]);
+      }
       Params.setCurrentPerturbation(0);  //3mA
     } else if(q==1){
-      Systematics.addSystematicUp("Beam Size", ratios);
+      for(int i=0; i<nC; i++){
+	if(badCh[i]) continue; 
+	Systematics[i].addSystematicUp("Beam Size", ratios[i]);
+      }
       Params.setBeamSizePerturbation(0); 
     }else if(q==2){
-      Systematics.addSystematicUp("PScale", ratios);
+      for(int i=0; i<nC; i++){
+	if(badCh[i]) continue; 
+	Systematics[i].addSystematicUp("PScale", ratios[i]);
+      }
       Params.setPScalePerturbation(0);
     }
 

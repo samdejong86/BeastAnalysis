@@ -16,11 +16,8 @@ class SystematicHolder{
 
  public:
   SystematicHolder(){
-   ValueTousHER=0;
-   ValueBGHER=0;
-
-   ValueTousLER=0;
-   ValueBGLER=0;
+   ValueHER=0;
+   ValueLER=0;
   
   }
   
@@ -29,35 +26,26 @@ class SystematicHolder{
     
     out<<"------Systematic-Uncertainties------\n";
     
-    out<<"HER Touschek. Value: "<<ValueTousHER<<endl;
+    out<<"HER  Value: "<<ValueHER<<endl;
     out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
     for(int i=0; i<(int)name.size(); i++)
-      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<HERupTous[i] <<right<<setw(14)<<HERdownTous[i]<<endl;
+      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<HERup[i] <<right<<setw(14)<<HERdown[i]<<endl;
     out<<endl;
 
 
-    out<<"HER Beam Gas. Value: "<<ValueBGHER<<endl;
+
+    out<<"LER  Value: "<<ValueLER<<endl;
     out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
     for(int i=0; i<(int)name.size(); i++)
-      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<HERupBG[i] <<right<<setw(14)<<HERdownBG[i]<<endl;
-    out<<endl<<endl;
-
-
-    out<<"LER Touschek. Value: "<<ValueTousLER<<endl;
-    out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
-    for(int i=0; i<(int)name.size(); i++)
-      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<LERupTous[i] <<right<<setw(14)<<LERdownTous[i]<<endl;
+      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<LERup[i] <<right<<setw(14)<<LERdown[i]<<endl;
     out<<endl;
 
 
-    out<<"LER Beam Gas. Value: "<<ValueBGLER<<endl;
-    out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
-    for(int i=0; i<(int)name.size(); i++)
-      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<LERupBG[i] <<right<<setw(14)<<LERdownBG[i]<<endl;
-    out<<endl<<endl;
 
 
   }
+
+  /*
 
   //print to an xml file
   void xmlPrint(TString DataBranchName, TString filename) {
@@ -159,30 +147,15 @@ class SystematicHolder{
     for(int i=0; i<(int)name.size(); i++)
       name[i].ReplaceAll("_", " ");
   }
-
+  */
   
   //set the ratio values.
   void setData(dataSimRatio data){
     
-   ValueTousHER = data.getHERTouschek(); 
-   ValueBGHER = data.getHERBeamGas();
+   ValueHER = data.getHER(); 
+   ValueLER = data.getLER();
 
-   ValueTousLER=data.getLERTouschek();
-   ValueBGLER = data.getLERBeamGas();
-
-   
-   //add location uncertainty
-   name.push_back("Location");
-   LERupTous.push_back(data.getLERTouschekError());
-   HERupTous.push_back(data.getHERTouschekError());
-   LERdownBG.push_back(data.getLERBeamGasError());
-   HERdownBG.push_back(data.getHERBeamGasError());
-
-   LERdownTous.push_back(data.getLERTouschekError());
-   HERdownTous.push_back(data.getHERTouschekError());
-   LERupBG.push_back(data.getLERBeamGasError());
-   HERupBG.push_back(data.getHERBeamGasError());
-   
+      
   }
 
   void setPScale(double PScaleHER, double PScaleLER){
@@ -202,11 +175,9 @@ class SystematicHolder{
     for(int i=0; i<(int)name.size(); i++){
       if(name[i]==sysName){   
 	found=true;
-	LERupTous[i] = data.getLERTouschek()-ValueTousLER;
-	HERupTous[i] = data.getHERTouschek()-ValueTousHER;
+	LERup[i] = data.getLER()-ValueLER;
+	HERup[i] = data.getHER()-ValueHER;
 	
-	LERupBG[i] = data.getLERBeamGas()-ValueBGLER;
-	HERupBG[i] = data.getHERBeamGas()-ValueBGHER;
       }
     }
 
@@ -214,18 +185,14 @@ class SystematicHolder{
     if(!found){
       name.push_back(sysName);
       
-      LERupTous.push_back(data.getLERTouschek()-ValueTousLER);
-      HERupTous.push_back(data.getHERTouschek()-ValueTousHER);
+      LERup.push_back(data.getLER()-ValueLER);
+      HERup.push_back(data.getHER()-ValueHER);
 	
-      LERupBG.push_back(data.getLERBeamGas()-ValueBGLER);
-      HERupBG.push_back(data.getHERBeamGas()-ValueBGHER);
 
       //add an entry to the down vector as well
-      LERdownTous.push_back(0);
-      HERdownTous.push_back(0);
+      LERdown.push_back(0);
+      HERdown.push_back(0);
 	
-      LERdownBG.push_back(0);
-      HERdownBG.push_back(0);
     }
   }
 
@@ -233,31 +200,23 @@ class SystematicHolder{
 //add a down systematic error.
 void addSystematicDown(TString sysName, dataSimRatio data){
     bool found=false;
-    for(int i=0; i<(int)name.size(); i++){
+  for(int i=0; i<(int)name.size(); i++){
       if(name[i]==sysName){
 	found=true;
-	LERdownTous[i] = data.getLERTouschek()-ValueTousLER;
-	HERdownTous[i] = data.getHERTouschek()-ValueTousHER;
+	LERdown[i] = data.getLER()-ValueLER;
+	HERdown[i] = data.getHER()-ValueHER;
 	
-	LERdownBG[i] = data.getLERBeamGas()-ValueBGLER;
-	HERdownBG[i] = data.getHERBeamGas()-ValueBGHER;
       }
     }
-
     if(!found){
       name.push_back(sysName);
       
-      LERdownTous.push_back(data.getLERTouschek()-ValueTousLER);
-      HERdownTous.push_back(data.getHERTouschek()-ValueTousHER);
+      LERdown.push_back(data.getLER()-ValueLER);
+      HERdown.push_back(data.getHER()-ValueHER);
 	
-      LERdownBG.push_back(data.getLERBeamGas()-ValueBGLER);
-      HERdownBG.push_back(data.getHERBeamGas()-ValueBGHER);
-
-      LERupTous.push_back(0);
-      HERupTous.push_back(0);
+      LERup.push_back(0);
+      HERup.push_back(0);
 	
-      LERupBG.push_back(0);
-      HERupBG.push_back(0);
     }
   }
 
@@ -267,10 +226,8 @@ void addSystematicDown(TString sysName, dataSimRatio data){
  private:
 
   //the data/sim ratios
-  double ValueTousLER;
-  double ValueBGLER;
-  double ValueTousHER;
-  double ValueBGHER;
+  double ValueLER;
+  double ValueHER;
 
   double PScaleH;
   double PScaleL;
@@ -281,16 +238,12 @@ void addSystematicDown(TString sysName, dataSimRatio data){
   vector<TString> name;  //systematuc names 
 
   //LER uncertainties
-  vector<double> LERupTous;
-  vector<double> LERdownTous;
-  vector<double> LERupBG;
-  vector<double> LERdownBG;
+  vector<double> LERup;
+  vector<double> LERdown;
 
   //HER uncertainties
-  vector<double> HERupTous;
-  vector<double> HERdownTous;
-  vector<double> HERupBG;
-  vector<double> HERdownBG;
+  vector<double> HERup;
+  vector<double> HERdown;
 
 
 };
