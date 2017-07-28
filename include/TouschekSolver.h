@@ -38,6 +38,8 @@ class TouschekSolver{
   TMatrixD getVariance() {return Var;}
   double getTousFitParameters(){return soln[1][0];}
   double getBGFitParameters(){return soln[0][0];}
+  double getTousFitError(){return Var[1][1];}
+  double getBGFitError(){return Var[0][0];}
   
   
   void draw(TGraphErrors *data, TH1F *Coulomb, TH1F *Touschek);

@@ -113,11 +113,11 @@ void beamSim::getSimBeamPars(){
   truth->SetBranchAddress("SAD_I_LER", &SAD_I_LER);
   truth->SetBranchAddress("SAD_P_HER", &SAD_P_HER);
   truth->SetBranchAddress("SAD_P_LER", &SAD_P_LER);
-  truth->SetBranchAddress("SAD_sigma_HER", &SAD_sigma_HER);
-  truth->SetBranchAddress("SAD_sigma_LER", &SAD_sigma_LER);
+  //truth->SetBranchAddress("SAD_sigma_HER", &SAD_sigma_HER);
+  //truth->SetBranchAddress("SAD_sigma_LER", &SAD_sigma_LER);
   
-  //truth->SetBranchAddress("SAD_sigma_y_HER", &SAD_sigma_HER);
-  //truth->SetBranchAddress("SAD_sigma_y_LER", &SAD_sigma_LER);
+  truth->SetBranchAddress("SAD_sigma_y_HER", &SAD_sigma_HER);
+  truth->SetBranchAddress("SAD_sigma_y_LER", &SAD_sigma_LER);
   
   
   truth->SetBranchAddress("SAD_bunchNb_HER", &SAD_bunchNB_HER);
@@ -281,7 +281,7 @@ void beamSim::Simulate(TString inputFile, TString outfilename){
 	(ParamLT.at(j)*LERCUR*LERCUR/(bszLER->at(0)*lBunch))+
 	(ParamHT.at(j)*HERCUR*HERCUR/(bszHER->at(0)*nBnHER));
       
-      simBranch->push_back(Efficiencies[j]*simRate); //combine with efficiencies
+      simBranch->push_back(simRate); //combine with efficiencies
       
       }
     outtree->Fill();
@@ -421,7 +421,7 @@ void beamSim::PerturbedSimulate(TString inputFile, TString outfilename, bool pos
 	  (ParamLT.at(j)*LERCUR*LERCUR/(bszLER->at(0)*beamsizeScale*lBunch))+
 	  (ParamHT.at(j)*HERCUR*HERCUR/(bszHER->at(0)*beamsizeScale*nBnHER));
 	
-	simBranch->push_back(Efficiencies[j]*simRate);
+	simBranch->push_back(simRate);
 	
       }
       outtree->Fill();
