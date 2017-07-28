@@ -45,7 +45,7 @@ class SystematicHolder{
 
   }
 
-  /*
+  
 
   //print to an xml file
   void xmlPrint(TString DataBranchName, TString filename) {
@@ -63,79 +63,50 @@ class SystematicHolder{
 
     out<<"<"<<DataBranchName<<">"<<endl;                      //the start tag is <DetectorBranchName>
 
-    out<<"  <HER>"<<endl;                                     //start of HER background components
+    out<<"  <HER value=\""<<ValueHER<<"\">"<<endl      ;                         //start of HER background 
     out<<"    <PScale value=\""<<PScaleH<<"\">"<<endl;
     out<<"      "<<PScaleHEr<<endl;
     out<<"    </PScale>"<<endl;
-    out<<"    <Touschek value=\""<<ValueTousHER<<"\">"<<endl; //HER touschek
+    out<<"    <Uncertainty>"<<endl;
     for(int i=0; i<(int)name.size(); i++){
       out<<"      <"<<name[i]<<">"<<endl;                    //systematic name
 
       out<<"        <up>"<<endl;                             //up error
-      out<<"          "<<HERupTous[i]<<endl;
+      out<<"          "<<HERup[i]<<endl;
       out<<"        </up>"<<endl;
 
       out<<"        <down>"<<endl;                           //down error
-      out<<"          "<<HERdownTous[i]<<endl;
+      out<<"          "<<HERdown[i]<<endl;
       out<<"        </down>"<<endl;
 
       out<<"      </"<<name[i]<<">"<<endl;
     }
-    out<<"    </Touschek>"<<endl;                            //end of HER touschek
 
-    out<<"    <Beam_Gas value=\""<<ValueBGHER<<"\">"<<endl;  //HER beam gas... (and so one)
-    for(int i=0; i<(int)name.size(); i++){
-     out<<"      <"<<name[i]<<">"<<endl; 
-
-      out<<"        <up>"<<endl;
-      out<<"          "<<HERupBG[i]<<endl;
-      out<<"        </up>"<<endl;
-
-      out<<"        <down>"<<endl;
-      out<<"          "<<HERdownBG[i]<<endl;
-      out<<"        </down>"<<endl;
-
-      out<<"      </"<<name[i]<<">"<<endl;
-    }
-    out<<"    </Beam_Gas>"<<endl;
+    out<<"    </Uncertainty>"<<endl;
     out<<"  </HER>"<<endl;                                   //end of HER
 
-    out<<"  <LER>"<<endl;                                    //start of LER
+    out<<"  <LER value=\""<<ValueLER<<"\">"<<endl;                                    //start of LER
     out<<"    <PScale value=\""<<PScaleL<<"\">"<<endl;
     out<<"      "<<PScaleLEr<<endl;
     out<<"    </PScale>"<<endl;
-    out<<"    <Touschek value=\""<<ValueTousLER<<"\">"<<endl;
+
+    out<<"    <Uncertainty>"<<endl;
     for(int i=0; i<(int)name.size(); i++){
     out<<"      <"<<name[i]<<">"<<endl;
 
       out<<"        <up>"<<endl;
-      out<<"          "<<LERupTous[i]<<endl;
+      out<<"          "<<LERup[i]<<endl;
       out<<"        </up>"<<endl;
 
       out<<"        <down>"<<endl;
-      out<<"          "<<LERdownTous[i]<<endl;
+      out<<"          "<<LERdown[i]<<endl;
       out<<"        </down>"<<endl;
 
       out<<"      </"<<name[i]<<">"<<endl;
 
     }
-    out<<"    </Touschek>"<<endl;
-
-    out<<"    <Beam_Gas value=\""<<ValueBGLER<<"\">"<<endl;
-    for(int i=0; i<(int)name.size(); i++){
-     out<<"      <"<<name[i]<<">"<<endl;
-
-      out<<"        <up>"<<endl;
-      out<<"          "<<LERupBG[i]<<endl;
-      out<<"        </up>"<<endl;
-
-      out<<"        <down>"<<endl;
-      out<<"          "<<LERdownBG[i]<<endl;
-      out<<"        </down>"<<endl;
-
-      out<<"      </"<<name[i]<<">"<<endl;
-    }
-    out<<"    </Beam_Gas>"<<endl;
+    
+    out<<"    </Uncertainty>"<<endl;
     out<<"  </LER>"<<endl;                   //end of LER
 
     out<<"</"<<DataBranchName<<">"<<endl;    //end of detector tag
@@ -147,7 +118,7 @@ class SystematicHolder{
     for(int i=0; i<(int)name.size(); i++)
       name[i].ReplaceAll("_", " ");
   }
-  */
+  
   
   //set the ratio values.
   void setData(dataSimRatio data){

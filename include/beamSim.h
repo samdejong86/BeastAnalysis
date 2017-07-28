@@ -39,6 +39,7 @@ class beamSim{
   void setCurrentPerturbation(double perturbation){ currentPerturb=perturbation;}
   void setBeamSizePerturbation(double perturbation){ beamSizePerturb=perturbation;}
   void setPScalePerturbation(double perturbation){ PScalePerturb=perturbation;}
+  void setEfficiencies(vector<double> eff){ Efficiencies=eff;}
 
   //get methods
   vector<double> getLT(){return ParamLT;}

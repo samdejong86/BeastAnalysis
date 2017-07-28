@@ -67,10 +67,10 @@ beamSim::beamSim(TString file, TString DataBranch, int nCh){
   Efficiencies.resize(nCh);
   for(int i=0; i<nCh; i++) Efficiencies[i]=1;
   if(DataBranch.Contains("HE3")){
-    Efficiencies[0] = 0.278;
-    Efficiencies[1] = 0.201;
-    Efficiencies[2] = 0.154;
-    Efficiencies[3] = 0.282;
+    Efficiencies[0] = 1;//0.278;
+    Efficiencies[1] = 1;//0.201;
+    Efficiencies[2] = 1;//0.154;
+    Efficiencies[3] = 1;//0.282;
   }
   currentPerturb=0;
   beamSizePerturb=0;
@@ -421,7 +421,7 @@ void beamSim::PerturbedSimulate(TString inputFile, TString outfilename, bool pos
 	  (ParamLT.at(j)*LERCUR*LERCUR/(bszLER->at(0)*beamsizeScale*lBunch))+
 	  (ParamHT.at(j)*HERCUR*HERCUR/(bszHER->at(0)*beamsizeScale*nBnHER));
 	
-	simBranch->push_back(simRate);
+	simBranch->push_back(Efficiencies[0]*simRate);
 	
       }
       outtree->Fill();

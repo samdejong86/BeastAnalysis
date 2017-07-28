@@ -320,11 +320,18 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
     cout<<i<<"\t"<<Systematics[i];
   }
 
-  /*
+  
   //print systematics in xml file
   TString filename = "data/Systematics.xml";
-  Systematics.xmlPrint(inputBranchName+forwardOrBackward, filename);
 
+  for(int i=0; i<nC; i++){
+    if(badCh[i]) continue;  
+    ss<<i;
+    TString num=ss.str();
+    Systematics[i].xmlPrint(inputBranchName+forwardOrBackward+num, filename);
+    ss.str("");
+  }
+  /*
 
   //produce systematic plots using python script
   #ifdef PLOTSYSTEMATICS

@@ -23,7 +23,7 @@ void doSystematicStudy(vector<SystematicHolder> &Systematics, double PScaleHEREr
 
 
   //loop over three systematics: current, beam size, and PScale
-  for(int q=0; q<3; q++){
+  for(int q=0; q<4; q++){
     
     
     if(q==0){ //perturb beam current up, then do the simulation
@@ -42,6 +42,18 @@ void doSystematicStudy(vector<SystematicHolder> &Systematics, double PScaleHEREr
       Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", true);
       Params.setPScalePerturbation(PScaleHERErr);
       Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", true);
+    } else if(q==3){//perturb efficiency up
+      vector<double> eff = {1.0827338129,
+			    1.0744680851,
+			    1.1103896104,
+			    1.07960199};
+
+      Params.setEfficiencies(eff);
+      
+      Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", true);
+      Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", true);
+
+
     }
   
     
@@ -94,6 +106,19 @@ void doSystematicStudy(vector<SystematicHolder> &Systematics, double PScaleHEREr
       Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", false);
       Params.setPScalePerturbation(PScaleHERErr);
       Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", false);
+    }else if(q==3){
+      for(int i=0; i<nC; i++){
+	if(badCh[i]) continue;  
+	Systematics[i].addSystematicDown("Efficiency", ratios[i]);
+      }
+      vector<double> eff = {0.9244604317,
+			    0.8971631206,
+			    0.9155844156,
+			    0.9253731343};
+
+      Params.setEfficiencies(eff);
+      Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", false);
+      Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", false);
     }
 
   
@@ -109,8 +134,8 @@ void doSystematicStudy(vector<SystematicHolder> &Systematics, double PScaleHEREr
     
     for(int i=0; i<nC; i++){
       if(badCh[i]) continue;          
-      ratios[i].addRatios(LER.getGraph(i), LERSystematic.getGraph(i), "LER");
-      ratios[i].addRatios(HER.getGraph(i), HERSystematic.getGraph(i), "HER");
+      ratios[i].addRatios(LER.getGraph(i), LERSystematic2.getGraph(i), "LER");
+      ratios[i].addRatios(HER.getGraph(i), HERSystematic2.getGraph(i), "HER");
     }
     
         
@@ -133,6 +158,14 @@ void doSystematicStudy(vector<SystematicHolder> &Systematics, double PScaleHEREr
 	Systematics[i].addSystematicUp("PScale", ratios[i]);
       }
       Params.setPScalePerturbation(0);
+    }else if(q==3){
+      for(int i=0; i<nC; i++){
+	if(badCh[i]) continue; 
+	Systematics[i].addSystematicUp("Efficiency", ratios[i]);
+      }
+      vector<double> eff = {1,1,1,1};
+      Params.setEfficiencies(eff);
+      
     }
 
     //delete temporary files
