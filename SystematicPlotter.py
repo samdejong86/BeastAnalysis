@@ -102,17 +102,25 @@ style = belle2style_mpl.b2_style_mpl()  #style created by Michael Hedges to matc
 plt.style.use(style)
 
 #my colours
-TColour = "#5A8F29"
-GColour = "#3C7DC4"
-HERColour = "#D22630"
-LERColour = "#3C7DC4"
+TColour = "#000000"
+GColour = "#000000"
+HERColour = "#000000"
+LERColour = "#000000"
+#TColour = "#5A8F29"
+#GColour = "#3C7DC4"
+#HERColour = "#D22630"
+#LERColour = "#3C7DC4"
 
 #the beast colours
-if beast:    
-    TColour = "#CDAD2C"
-    GColour = "#42ACB2"
-    HERColour = "#004855"
-    LERColour = "#D92E27"
+if beast:
+    TColour = "#000000"
+    GColour = "#000000"
+    HERColour = "#000000"
+    LERColour = "#000000"
+    #TColour = "#CDAD2C"
+    #GColour = "#42ACB2"
+    #HERColour = "#004855"
+    #LERColour = "#D92E27"
 
 
 # In[35]:

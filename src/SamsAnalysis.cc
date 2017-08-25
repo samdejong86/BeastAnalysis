@@ -127,6 +127,10 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   //generate histograms for drawing Touschek fit result
   TH1F *histCouLER = dataLER.getEmptyHist("CouL", "CouL", 1003);
   TH1F *histCouHER = dataHER.getEmptyHist("CouH", "CouH", 1003);
+
+  histCouLER->SetFillStyle(3144);
+  histCouHER->SetFillStyle(3144);
+
   
   TH1F *histTouLER = dataLER.getEmptyHist("TouL", "TouL", 1004);
   TH1F *histTouHER = dataHER.getEmptyHist("TouH", "TouH", 1004);
