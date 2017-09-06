@@ -290,16 +290,17 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
 
   cout<<ratios;
 
-
+  
  
   //------------------Systematics------------------
   
   
-  SystematicHolder Systematics;
+  SystematicHolder Systematics(nC);
   Systematics.setData(ratios);
   Systematics.setPScale(PressureScaleHER, PressureScaleLER);
   Systematics.setPScaleError(PScaleErrHER, PScaleErrLER);
-
+  
+  
   doSystematicStudy(solnHER, solnLER, Systematics, solnHER_sim, solnLER_sim, PScaleErrHER, PScaleErrLER);
   
   //print systematic uncertainties to console
@@ -316,7 +317,7 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   TString command = "python SystematicPlotter.py "+belle+" 0 "+imageType;
   gROOT->ProcessLine(".! "+command);
   #endif
-
+  
   		     
 }
 

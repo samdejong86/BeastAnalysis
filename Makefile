@@ -16,7 +16,7 @@ CPPFLAGS +=  -Wall -O2 $(ROOTCFLAGS)
 CPPFLAGS += -DBELLE     
 
 # uncomment if pdf figures are desired instead of png
-#CPPFLAGS += -DPDF     
+CPPFLAGS += -DPDF     
 
 # uncomment if you want the systematic plots to be automatically produced
 #CPPFLAGS += -DPLOTSYSTEMATICS

@@ -50,6 +50,18 @@ class dataReader{
   void readRunTimes();
   void readData();
 
+  TString displayname(TString branchName){
+
+    if(branchName=="LYSO_hitRate_forward") return "Forward LYSO";
+    else if(branchName=="CSI_Pure_hitRate_forward") return "Forward Pure CSI";
+    else if(branchName=="BGO_dose_forward") return "Forward BGO";
+    else if(branchName=="BGO_dose_backward") return "Backward BGO";
+    else if(branchName=="HE3_rate") return "Helium-3 tube rate";
+    else if(branchName=="BGO_dose") return "BGO dose [mRad/s]";
+    else return branchName.ReplaceAll("_", " ");
+        
+  }
+
 
  private:
 

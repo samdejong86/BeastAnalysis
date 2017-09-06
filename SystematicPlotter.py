@@ -30,7 +30,7 @@ PlotDir='figs/Results'
 if not os.path.exists(PlotDir):
     os.makedirs(PlotDir)
     
-imageType='png'
+imageType='pdf'
 
 beast=True
 show=True
@@ -46,19 +46,29 @@ if len(sys.argv) == 4:
         show=False
     imageType=sys.argv[3]
 
-
-# In[47]:
-
-
 #read the xml data into a pandas dataframe
 Data=[]
 PS=[]
 for Detector in root:
+    det=""
+    if Detector.tag=="LYSO_hitRate_forward":
+        det="Forward LYSO"
+    if Detector.tag=="CSI_Pure_hitRate_forward":
+        det="Forward Pure CSI"
+    if Detector.tag=="BGO_dose_forward":
+        det="Forward BGO"
+    if Detector.tag=="BGO_dose_backward":
+        det="Backward BGO"
+    if Detector.tag=="HE3_rate":
+        det="$^3He$ tube"
+        
+    ch=Detector.attrib['value']    
+
     for Beam in Detector:
         for BGSource in Beam:
             #Get PScale values
             if BGSource.tag=="PScale":
-                PS.append([Beam.tag, Detector.tag, float(BGSource.attrib['value']), float(BGSource.text)])
+                PS.append([Beam.tag, det, float(BGSource.attrib['value']), float(BGSource.text)])
                 continue
             value=0
             sumup=0
@@ -77,20 +87,19 @@ for Detector in root:
                                         
                 value= float(BGSource.attrib['value'])
             
-            Data.append([Beam.tag.replace('_', ' '), BGSource.tag.replace('_', ' '), Detector.tag.replace('_', ' '), value, math.sqrt(sumdown), math.sqrt(sumup)])
+            Data.append([Beam.tag.replace('_', ' '), BGSource.tag.replace('_', ' '), det, ch, value, math.sqrt(sumdown), math.sqrt(sumup)])
            
         
 #create the dataframe                
-HERLER = pd.DataFrame(Data, columns=['Beam', 'Source', 'Detector', 'ratio', 'lowerror', 'uppererror'])
+HERLER = pd.DataFrame(Data, columns=['Beam', 'Source', 'Detector', 'Channel', 'ratio', 'lowerror', 'uppererror'])
 
 #Create a PScale dataframe
 PScale = pd.DataFrame(PS, columns=['Beam', 'Detector', 'PScale', 'Error'])
 
-
-
-# In[42]:
+#print HERLER
 
 #import matplotlib
+import matplotlib as mpl
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -106,10 +115,6 @@ TColour = "#000000"
 GColour = "#000000"
 HERColour = "#000000"
 LERColour = "#000000"
-#TColour = "#5A8F29"
-#GColour = "#3C7DC4"
-#HERColour = "#D22630"
-#LERColour = "#3C7DC4"
 
 #the beast colours
 if beast:
@@ -117,99 +122,155 @@ if beast:
     GColour = "#000000"
     HERColour = "#000000"
     LERColour = "#000000"
-    #TColour = "#CDAD2C"
-    #GColour = "#42ACB2"
-    #HERColour = "#004855"
-    #LERColour = "#D92E27"
 
 
-# In[35]:
 
-#the font I'm using doesn't have a character for ^-, so I have to redefine how the axis is labeled
 from matplotlib.ticker import FuncFormatter
 
 def labeller(x, pos):
     return '10$^{'+str(int(np.log10(x)))+'}$'
-    
 
 
-# In[40]:
 
-#Plot Data/Sim for each detector
+   
+plt.figure(figsize=(800/80, 800/80))
 
-#loop over the beams
-for beam in 'HER', 'LER':
-    
-    plt.figure(figsize=(800/80, 500/80))
-
-    mainAx = plt.subplot(211)
-    
-    #loop over Touschek and beam gas
-    for source in 'Touschek', 'Beam Gas':
-        #select appropriate data from the data frame
-        Frame=HERLER.loc[lambda df: (df.Beam == beam), :].loc[lambda df: (df.Source == source), :] 
+mainAx = plt.subplot(211)
         
-        #The Touschek plot is the top half, beam gas is the bottom half
-        ThisColour=TColour
-        xlabel=''
-        if source == 'Touschek':
-            ax = mainAx
-            plt.setp(ax.get_xticklabels(), visible=False)
-        elif source == 'Beam Gas':
-            ax = plt.subplot(212, sharex=mainAx)
-            ThisColour=GColour
-            xlabel='Data/Sim ('+beam+')'            
-            plt.setp(ax.get_xticklabels(), visible=True)
+Hoffset=-0.1875
+Loffset=0.1875
+    
+#loop over Touschek and beam gas
+for source in 'Beam Gas', 'Touschek':
+    #select appropriate data from the data frame
+    AFrame=HERLER.loc[lambda df: (df.Source == source), :] 
+        
+    #The Touschek plot is the top half, beam gas is the bottom half
+    ThisColour=TColour
+    xlabel='$O_{bg}^{data}/O_{bg}^{sim}$'
+    if source == 'Beam Gas':
+        ax = mainAx
+        plt.setp(ax.get_xticklabels(), visible=False)
+    elif source == 'Touschek':
+        ax = plt.subplot(212, sharex=mainAx)
+        ThisColour=GColour
+        xlabel='$O_{T}^{data}/O_{T}^{sim}$'            
+        plt.setp(ax.get_xticklabels(), visible=True)
 
+        
+    for beam in 'HER', 'LER':
+    
+        HFrame=HERLER.loc[lambda df: (df.Beam == beam), :].loc[lambda df: (df.Source == source), :] 
+    
+    
+        c='#0000FF'
+        m='^'
+        o=Hoffset
+        if beam == 'LER':
+            c='#FF0000'
+            m='o'
+            o=Loffset
+        
         #plot data
-        sns.stripplot(Frame.ratio, Frame.Detector , jitter=False, size=10, color=ThisColour, linewidth=0)
-
-        #add error abrs
+    #sns.stripplot(x="ratio", y="Detector", hue="Beam", data=AFrame, jitter=False, split=True, size=10, marker='o', edgecolor=['#FF0000','#0000FF'], linewidth=1)
+        sns.stripplot(HFrame.ratio, HFrame.Detector , jitter=False, size=10, marker=m,edgecolor=c, linewidth=1)
+  
         for y,ylabel in zip(ax.get_yticks(), ax.get_yticklabels()):
-            f = Frame['Detector'] == ylabel.get_text() 
-            ax.errorbar(Frame.ratio[f].values, 
-                        np.ones_like(Frame.ratio[f].values)*(y), 
-                        xerr=[Frame.lowerror[f].values, Frame.uppererror[f].values], 
-                        #ls='none', 
-                        elinewidth=2,
-                        capthick=2,
-                        color=ThisColour)
+            f = HFrame['Detector'] == ylabel.get_text() 
+            ax.errorbar(HFrame.ratio[f].values, 
+                        np.ones_like(HFrame.ratio[f].values)*(y+o), 
+                        xerr=[HFrame.lowerror[f].values, HFrame.uppererror[f].values], 
+                        alpha=.25,
+                        elinewidth=10,
+                        capthick=0,
+                        color=c,
+                        linewidth=0)
 
-        #set axis titles
-        plt.ylabel(source)
-        plt.xlabel(xlabel)
-
-        #set log scale on x
-        ax.set_xscale("log", nonposx='clip')
-
-        #set ticks pointing in
-        ax.tick_params(direction='in', pad=15)
-        ax.tick_params(which='minor', direction='in', pad=15)
         
-        #don't add grid if belle style is requested
-        if beast==False:
-            ax.grid(True)
+    for point in ax.collections:
+        point.set_facecolor('none')
+           
+        offsets=point.get_offsets()
+        o=Loffset
+        if point.get_edgecolors()[0][0]<0.5:
+            o=Hoffset
+       
         
-            gridlines = ax.get_xgridlines() + ax.get_ygridlines()
-            for line in gridlines:
-                line.set_linestyle('dotted')
-                line.set_color('black')
+        for i in range(0,len(offsets)):
+            offsets[i][1] = offsets[i][1]+o
+            
+
+        point.set_offsets(offsets)
+
+
+        
+            
+        
+        
+     
+        
+
+    #set axis titles
+    plt.ylabel('')
+    plt.xlabel(xlabel, horizontalalignment='right', x=1.0)
+        
     
-        custom_formatter = FuncFormatter(labeller)
-        ax.xaxis.set_major_formatter(custom_formatter)
+    #set log scale on x
+    ax.set_xscale("log", nonposx='clip')
+
+    ax.set_xlim(0.01, 10000)
+    ax.set_ylim(4.5, -0.5)
+        
+    #set ticks pointing in
+        
+    plt.tick_params(axis='y',          # changes apply to the x-axis
+                    which='minor',      # both major and minor ticks are affected
+                    left='off',      # ticks along the bottom edge are off
+                    right='off') # labels along the bottom edge are off   
+    
+    plt.tick_params(axis='y',          # changes apply to the x-axis
+                    which='major',      # both major and minor ticks are affected
+                    direction='in',
+                    pad=15) # labels along the bottom edge are off       
+        
+        
+    plt.tick_params(axis='x',          # changes apply to the x-axis
+                    which='both',      # both major and minor ticks are affected
+                    direction='in',
+                    pad=15) # labels along the bottom edge are off    
+        
     
         
-        plt.tight_layout()
+    #don't add grid if belle style is requested
+    if beast==False:
+        ax.grid(True)
+        
+        gridlines = ax.get_xgridlines() + ax.get_ygridlines()
+        for line in gridlines:
+            line.set_linestyle('dotted')
+            line.set_color('black')
+    
+    custom_formatter = FuncFormatter(labeller)
+    ax.xaxis.set_major_formatter(custom_formatter)
+    
+        
+    plt.tight_layout()
     
     #save plot
-    plt.savefig(PlotDir+'/'+beam+'RatioPlot.'+imageType)
+    plt.savefig(PlotDir+'/RatioPlot.'+imageType)
               
     #show plot
-    if show:
-        sns.plt.show()
+if show:
+    sns.plt.show()
 
 
-# In[46]:
+
+
+
+
+
+
+
 
 #Plot PScale for each detector
 
@@ -245,7 +306,11 @@ for beam in 'HER', 'LER':
 
     #set axis titles
     plt.ylabel(beam)
-    plt.xlabel('PScale')
+    xlab = "$P_{Scale}$"
+    if beam == 'HER':
+        xlab = xlab+"$Z_{e}^{2}$"
+    plt.xlabel(xlab)
+
 
     #set ticks pointing in
     ax.tick_params(direction='in', pad=15)

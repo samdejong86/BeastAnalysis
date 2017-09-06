@@ -9,6 +9,7 @@ using namespace std;
 
 #include "dataReader.h"
 #include "xmlParser.h"
+//#include "BadChannel.h"
 
 //copy constructor
 dataReader::dataReader(const dataReader &obj){
@@ -88,7 +89,7 @@ TH1F *dataReader::getEmptyHist(TString name, TString title, int fillColour){
 
     }
     h->SetFillColor(fillColour);
-    h->GetYaxis()->SetTitle(DataBranchName);
+    h->GetYaxis()->SetTitle(displayname(DataBranchName));
     
     return h;
 
@@ -155,6 +156,7 @@ void dataReader::readData(){
   tout->SetBranchAddress("SKB_"+Ring+"_injectionFlag_safe", &injFlag);
   if(Ring=="LER"){
     tout->SetBranchAddress("SKB_LER_Zeff_D02", &Zeff);
+    //Zeff->push_back(1);
     tout->SetBranchAddress("SKB_"+Ring+"_injectionNumberOfBunches", &nBunch);    
   } else {  //HER has no Zeff, and doesn't seem to have nbunches.
     Zeff->push_back(1);

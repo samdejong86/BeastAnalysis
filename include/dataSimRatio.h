@@ -11,23 +11,19 @@ class dataSimRatio{
   
  public:
   dataSimRatio(){
-    HERTouschek=0;
-    LERTouschek=0;
-    HERBeamGas=0;
-    LERBeamGas=0;
 }
 
   //set the ratio
-  void setHERTouschek(double num){HERTouschek=num;}
-  void setHERBeamGas(double num){HERBeamGas=num;}
-  void setLERTouschek(double num){LERTouschek=num;}
-  void setLERBeamGas(double num){LERBeamGas=num;}
+  void setHERTouschek(double num, int ch){HERTouschek[ch]=num;}
+  void setHERBeamGas(double num, int ch){HERBeamGas[ch]=num;}
+  void setLERTouschek(double num, int ch){LERTouschek[ch]=num;}
+  void setLERBeamGas(double num, int ch){LERBeamGas[ch]=num;}
 
   //get the ratio
-  double getHERTouschek(){return HERTouschek;}
-  double getHERBeamGas(){return HERBeamGas;}
-  double getLERTouschek(){return LERTouschek;}
-  double getLERBeamGas(){return LERBeamGas;}
+  double getHERTouschek(int c){return HERTouschek[c];}
+  double getHERBeamGas(int c){return HERBeamGas[c];}
+  double getLERTouschek(int c){return LERTouschek[c];}
+  double getLERBeamGas(int c){return LERBeamGas[c];}
 
   //get location error
   double getHERTouschekError(){return HERTouschekErr;}
@@ -38,77 +34,63 @@ class dataSimRatio{
 
   //calculate data/sim ratio for HER or LER
   void addRatios(vector<TouschekSolver> data, vector<TouschekSolver> Sim, TString Ring){
+    
+    if(Ring=="LER"){
+      LERTouschek.resize(data.size());
+      LERBeamGas.resize(data.size());
+    }else if(Ring="HER"){
+      HERTouschek.resize(data.size());
+      HERBeamGas.resize(data.size());
+    }
 
-    int n=0;
-    double meanTou = 0.0;
-    double M2Tou = 0.0;
-
-    double meanBG = 0.0;
-    double M2BG = 0.0;
 
     //calculate data/sim ratio for Touschek and beam-gas
-    double beamGas=0;
-    double Touschek=0;
     for(int i=0; i<(int)data.size(); i++){
       if(badCh[i]) continue;
+      
+
+
       
       double dataBG = data[i].getBGFitParameters();
       double dataTous = data[i].getTousFitParameters();
       
       double simBG = Sim[i].getBGFitParameters();
       double simTous = Sim[i].getTousFitParameters();
+       
+      double Touschek = dataTous/simTous;
+      double beamGas  = dataBG/simBG;
+  
       
-      double x=dataTous/simTous;
-      double y=dataBG/simBG;
-      
-      //running stdev calculation
-      n+=1;
-      double deltaTou = x-meanTou;
-      meanTou += deltaTou/n;
-      double delta2Tou = x-meanTou;
-      M2Tou=deltaTou*delta2Tou;
-
-      double deltaBG = y-meanBG;
-      meanBG += deltaBG/n;
-      double delta2BG = y-meanBG;
-      M2BG=deltaBG*delta2BG;
-
-      
-      Touschek += dataTous/simTous;
-      beamGas  += dataBG/simBG;
-      
-      
+    
+      if(Ring=="LER"){
+	LERTouschek[i] = Touschek;
+	LERBeamGas[i] = beamGas;
+      }else if(Ring="HER"){
+	HERTouschek[i] = Touschek;
+	HERBeamGas[i] = beamGas;
+      }
     }
-    if(Ring=="LER"){
-      LERTouschek = Touschek/n;
-      LERBeamGas = beamGas/n;
-      LERTouschekErr=sqrt(M2Tou/(n-1));
-      LERBeamGasErr=sqrt(M2BG/(n-1));
-    }else if(Ring="HER"){
-      HERTouschek = Touschek/n;
-      HERBeamGas = beamGas/n;
-      HERTouschekErr=sqrt(M2Tou/(n-1));
-      HERBeamGasErr=sqrt(M2BG/(n-1));
-    }
- 
   }
 
   //cout method
   void printOn(ostream & out) const{
 
     out<<"\n\n------------Results------------\n";
-    out<<"HER: \ndata/sim for Touschek:  "<<HERTouschek<<endl;
-    out<<"data/sim for Beam Gas:  "<<HERBeamGas<<endl<<endl;
-    out<<"LER: \ndata/sim for Touschek:  "<<LERTouschek<<endl;
-    out<<"data/sim for Beam Gas:  "<<LERBeamGas<<endl; 
-
+    for(int i=0; i<HERTouschek.size(); i++){
+      if(badCh[i]) continue;
+      out<<"Channel "<<i<<endl;
+      out<<"HER: \ndata/sim for Touschek:  "<<HERTouschek[i]<<endl;
+      out<<"data/sim for Beam Gas:  "<<HERBeamGas[i]<<endl<<endl;
+      out<<"LER: \ndata/sim for Touschek:  "<<LERTouschek[i]<<endl;
+      out<<"data/sim for Beam Gas:  "<<LERBeamGas[i]<<endl; 
+    }
   }
 
  private:
-  double HERTouschek;
-  double LERTouschek;
-  double HERBeamGas;
-  double LERBeamGas;
+  vector<double> HERTouschek;
+  vector<double> LERTouschek;
+  vector<double> HERBeamGas;
+  vector<double> LERBeamGas;
 
 
   double HERTouschekErr;

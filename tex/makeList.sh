@@ -1,6 +1,6 @@
 rm -rf files.tex
 prefix="../figs/"
-suffix=".png"
+suffix=".pdf"
 echo '\newcommand*{\ListOfFiles}{' >> files.tex
 
 for f in ../figs/*

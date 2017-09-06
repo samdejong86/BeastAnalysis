@@ -10,10 +10,11 @@ rm -r figs/*
 
 ./SamsAnalysis HE3_rate
 
-python SystematicPlotter.py 0 0 png
+python SystematicPlotter.py 1 0 png
+python SystematicPlotter.py 1 0 pdf
 
-cd tex
-source makeList.sh
-pdflatex SamsAnalysis.tex >> /dev/null 2>&1
-pdflatex SamsAnalysis.tex >> /dev/null 2>&1
-cd $OLDPWD
+#cd tex
+#source makeList.sh
+#pdflatex SamsAnalysis.tex >> /dev/null 2>&1
+#pdflatex SamsAnalysis.tex >> /dev/null 2>&1
+#cd $OLDPWD

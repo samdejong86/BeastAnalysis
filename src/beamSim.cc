@@ -66,11 +66,12 @@ beamSim::beamSim(TString file, TString DataBranch, int nCh){
   
   Efficiencies.resize(nCh);
   for(int i=0; i<nCh; i++) Efficiencies[i]=1;
-  if(DataBranch.Contains("HE3")){
-    Efficiencies[0] = 0.278;
-    Efficiencies[1] = 0.201;
-    Efficiencies[2] = 0.154;
-    Efficiencies[3] = 0.282;
+  if(DataBranch.Contains("BGO")){
+    for(int i=0; i<nCh; i++) Efficiencies[i]=5.11e-5;
+    //Efficiencies[0] = 0.278;
+    //Efficiencies[1] = 0.201;
+    //Efficiencies[2] = 0.154;
+    //Efficiencies[3] = 0.282;
   }
   currentPerturb=0;
   beamSizePerturb=0;

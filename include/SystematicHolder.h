@@ -16,11 +16,28 @@ class SystematicHolder{
 
  public:
   SystematicHolder(){
-   ValueTousHER=0;
-   ValueBGHER=0;
+ 
+  
+  }
 
-   ValueTousLER=0;
-   ValueBGLER=0;
+  SystematicHolder(int nChannels){
+    nCh=nChannels;
+    
+    LERupTous.resize(nCh);
+    LERdownTous.resize(nCh);
+    LERupBG.resize(nCh);
+    LERdownBG.resize(nCh);
+    
+    HERupTous.resize(nCh);
+    HERdownTous.resize(nCh);
+    HERupBG.resize(nCh);
+    HERdownBG.resize(nCh);
+
+
+    ValueTousLER.resize(nCh);
+    ValueBGLER.resize(nCh);
+    ValueTousHER.resize(nCh);
+    ValueBGHER.resize(nCh);
   
   }
   
@@ -28,34 +45,38 @@ class SystematicHolder{
   void printOn(ostream & out) const{
     
     out<<"------Systematic-Uncertainties------\n";
-    
-    out<<"HER Touschek. Value: "<<ValueTousHER<<endl;
+    for(int j=0; j<nCh; j++){
+      if(badCh[j]) continue;
+      out<<j<<endl;
+      
+
+    out<<"HER Touschek. Value: "<<ValueTousHER[j]<<endl;
     out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
     for(int i=0; i<(int)name.size(); i++)
-      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<HERupTous[i] <<right<<setw(14)<<HERdownTous[i]<<endl;
+      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<HERupTous[j][i] <<right<<setw(14)<<HERdownTous[j][i]<<endl;
     out<<endl;
 
 
-    out<<"HER Beam Gas. Value: "<<ValueBGHER<<endl;
+    out<<"HER Beam Gas. Value: "<<ValueBGHER[j]<<endl;
     out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
     for(int i=0; i<(int)name.size(); i++)
-      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<HERupBG[i] <<right<<setw(14)<<HERdownBG[i]<<endl;
+      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<HERupBG[j][i] <<right<<setw(14)<<HERdownBG[j][i]<<endl;
     out<<endl<<endl;
 
 
-    out<<"LER Touschek. Value: "<<ValueTousLER<<endl;
+    out<<"LER Touschek. Value: "<<ValueTousLER[j]<<endl;
     out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
     for(int i=0; i<(int)name.size(); i++)
-      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<LERupTous[i] <<right<<setw(14)<<LERdownTous[i]<<endl;
+      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<LERupTous[j][i] <<right<<setw(14)<<LERdownTous[j][i]<<endl;
     out<<endl;
 
 
-    out<<"LER Beam Gas. Value: "<<ValueBGLER<<endl;
+    out<<"LER Beam Gas. Value: "<<ValueBGLER[j]<<endl;
     out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
     for(int i=0; i<(int)name.size(); i++)
-      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<LERupBG[i] <<right<<setw(14)<<LERdownBG[i]<<endl;
+      out<<left<<setw(10)<<name[i]<<right<<setw(12)<<LERupBG[j][i] <<right<<setw(14)<<LERdownBG[j][i]<<endl;
     out<<endl<<endl;
-
+    }
 
   }
 
@@ -73,38 +94,41 @@ class SystematicHolder{
     for(int i=0; i<(int)name.size(); i++)
       name[i].ReplaceAll(" ", "_");
 
-    out<<"<"<<DataBranchName<<">"<<endl;                      //the start tag is <DetectorBranchName>
+    for(int j=0; j<nCh; j++){
+      if(badCh[j]) continue;
+
+    out<<"<"<<DataBranchName<<" value=\""<<j<<"\">"<<endl;                      //the start tag is <DetectorBranchName>
 
     out<<"  <HER>"<<endl;                                     //start of HER background components
     out<<"    <PScale value=\""<<PScaleH<<"\">"<<endl;
     out<<"      "<<PScaleHEr<<endl;
     out<<"    </PScale>"<<endl;
-    out<<"    <Touschek value=\""<<ValueTousHER<<"\">"<<endl; //HER touschek
+    out<<"    <Touschek value=\""<<ValueTousHER[j]<<"\">"<<endl; //HER touschek
     for(int i=0; i<(int)name.size(); i++){
       out<<"      <"<<name[i]<<">"<<endl;                    //systematic name
 
       out<<"        <up>"<<endl;                             //up error
-      out<<"          "<<HERupTous[i]<<endl;
+      out<<"          "<<HERupTous[j][i]<<endl;
       out<<"        </up>"<<endl;
 
       out<<"        <down>"<<endl;                           //down error
-      out<<"          "<<HERdownTous[i]<<endl;
+      out<<"          "<<HERdownTous[j][i]<<endl;
       out<<"        </down>"<<endl;
 
       out<<"      </"<<name[i]<<">"<<endl;
     }
     out<<"    </Touschek>"<<endl;                            //end of HER touschek
 
-    out<<"    <Beam_Gas value=\""<<ValueBGHER<<"\">"<<endl;  //HER beam gas... (and so one)
+    out<<"    <Beam_Gas value=\""<<ValueBGHER[j]<<"\">"<<endl;  //HER beam gas... (and so one)
     for(int i=0; i<(int)name.size(); i++){
      out<<"      <"<<name[i]<<">"<<endl; 
 
       out<<"        <up>"<<endl;
-      out<<"          "<<HERupBG[i]<<endl;
+      out<<"          "<<HERupBG[j][i]<<endl;
       out<<"        </up>"<<endl;
 
       out<<"        <down>"<<endl;
-      out<<"          "<<HERdownBG[i]<<endl;
+      out<<"          "<<HERdownBG[j][i]<<endl;
       out<<"        </down>"<<endl;
 
       out<<"      </"<<name[i]<<">"<<endl;
@@ -116,16 +140,16 @@ class SystematicHolder{
     out<<"    <PScale value=\""<<PScaleL<<"\">"<<endl;
     out<<"      "<<PScaleLEr<<endl;
     out<<"    </PScale>"<<endl;
-    out<<"    <Touschek value=\""<<ValueTousLER<<"\">"<<endl;
+    out<<"    <Touschek value=\""<<ValueTousLER[j]<<"\">"<<endl;
     for(int i=0; i<(int)name.size(); i++){
     out<<"      <"<<name[i]<<">"<<endl;
 
       out<<"        <up>"<<endl;
-      out<<"          "<<LERupTous[i]<<endl;
+      out<<"          "<<LERupTous[j][i]<<endl;
       out<<"        </up>"<<endl;
 
       out<<"        <down>"<<endl;
-      out<<"          "<<LERdownTous[i]<<endl;
+      out<<"          "<<LERdownTous[j][i]<<endl;
       out<<"        </down>"<<endl;
 
       out<<"      </"<<name[i]<<">"<<endl;
@@ -133,16 +157,16 @@ class SystematicHolder{
     }
     out<<"    </Touschek>"<<endl;
 
-    out<<"    <Beam_Gas value=\""<<ValueBGLER<<"\">"<<endl;
+    out<<"    <Beam_Gas value=\""<<ValueBGLER[j]<<"\">"<<endl;
     for(int i=0; i<(int)name.size(); i++){
      out<<"      <"<<name[i]<<">"<<endl;
 
       out<<"        <up>"<<endl;
-      out<<"          "<<LERupBG[i]<<endl;
+      out<<"          "<<LERupBG[j][i]<<endl;
       out<<"        </up>"<<endl;
 
       out<<"        <down>"<<endl;
-      out<<"          "<<LERdownBG[i]<<endl;
+      out<<"          "<<LERdownBG[j][i]<<endl;
       out<<"        </down>"<<endl;
 
       out<<"      </"<<name[i]<<">"<<endl;
@@ -152,8 +176,10 @@ class SystematicHolder{
 
     out<<"</"<<DataBranchName<<">"<<endl;    //end of detector tag
 
-    out<<"</xml>"<<endl;
+ 
 
+    }
+    out<<"</xml>"<<endl;
     out.close();
 
     for(int i=0; i<(int)name.size(); i++)
@@ -163,14 +189,16 @@ class SystematicHolder{
   
   //set the ratio values.
   void setData(dataSimRatio data){
-    
-   ValueTousHER = data.getHERTouschek(); 
-   ValueBGHER = data.getHERBeamGas();
+    for(int j=0; j<nCh; j++){
+      if(badCh[j]) continue;
 
-   ValueTousLER=data.getLERTouschek();
-   ValueBGLER = data.getLERBeamGas();
-
-   
+      ValueTousHER[j] = data.getHERTouschek(j); 
+      ValueBGHER[j] = data.getHERBeamGas(j);
+      
+      ValueTousLER[j]=data.getLERTouschek(j);
+      ValueBGLER[j] = data.getLERBeamGas(j);
+    }
+    /*
    //add location uncertainty
    name.push_back("Location");
    LERupTous.push_back(data.getLERTouschekError());
@@ -182,7 +210,7 @@ class SystematicHolder{
    HERdownTous.push_back(data.getHERTouschekError());
    LERupBG.push_back(data.getLERBeamGasError());
    HERupBG.push_back(data.getHERBeamGasError());
-   
+    */
   }
 
   void setPScale(double PScaleHER, double PScaleLER){
@@ -202,30 +230,36 @@ class SystematicHolder{
     for(int i=0; i<(int)name.size(); i++){
       if(name[i]==sysName){   
 	found=true;
-	LERupTous[i] = data.getLERTouschek()-ValueTousLER;
-	HERupTous[i] = data.getHERTouschek()-ValueTousHER;
-	
-	LERupBG[i] = data.getLERBeamGas()-ValueBGLER;
-	HERupBG[i] = data.getHERBeamGas()-ValueBGHER;
+	for(int j=0; j<nCh; j++){
+
+	  LERupTous[j][i] = data.getLERTouschek(j)-ValueTousLER[j];
+	  HERupTous[j][i] = data.getHERTouschek(j)-ValueTousHER[j];
+	  
+	  LERupBG[j][i] = data.getLERBeamGas(j)-ValueBGLER[j];
+	  HERupBG[j][i] = data.getHERBeamGas(j)-ValueBGHER[j];
+	}
       }
     }
 
     //if the systematic isn't found, add it to the vector
     if(!found){
       name.push_back(sysName);
-      
-      LERupTous.push_back(data.getLERTouschek()-ValueTousLER);
-      HERupTous.push_back(data.getHERTouschek()-ValueTousHER);
-	
-      LERupBG.push_back(data.getLERBeamGas()-ValueBGLER);
-      HERupBG.push_back(data.getHERBeamGas()-ValueBGHER);
 
-      //add an entry to the down vector as well
-      LERdownTous.push_back(0);
-      HERdownTous.push_back(0);
+      for(int j=0; j<nCh; j++){
+      
+	LERupTous[j].push_back(data.getLERTouschek(j)-ValueTousLER[j]);
+	HERupTous[j].push_back(data.getHERTouschek(j)-ValueTousHER[j]);
 	
-      LERdownBG.push_back(0);
-      HERdownBG.push_back(0);
+	LERupBG[j].push_back(data.getLERBeamGas(j)-ValueBGLER[j]);
+	HERupBG[j].push_back(data.getHERBeamGas(j)-ValueBGHER[j]);
+	
+	//add an entry to the down vector as well
+	LERdownTous[j].push_back(0);
+	HERdownTous[j].push_back(0);
+	
+	LERdownBG[j].push_back(0);
+	HERdownBG[j].push_back(0);
+      }
     }
   }
 
@@ -233,31 +267,38 @@ class SystematicHolder{
 //add a down systematic error.
 void addSystematicDown(TString sysName, dataSimRatio data){
     bool found=false;
+    
+    
+
     for(int i=0; i<(int)name.size(); i++){
       if(name[i]==sysName){
 	found=true;
-	LERdownTous[i] = data.getLERTouschek()-ValueTousLER;
-	HERdownTous[i] = data.getHERTouschek()-ValueTousHER;
-	
-	LERdownBG[i] = data.getLERBeamGas()-ValueBGLER;
-	HERdownBG[i] = data.getHERBeamGas()-ValueBGHER;
+	for(int j=0; j<nCh; j++){
+	  LERdownTous[j][i] = data.getLERTouschek(j)-ValueTousLER[j];
+	  HERdownTous[j][i] = data.getHERTouschek(j)-ValueTousHER[j];
+	  
+	  LERdownBG[j][i] = data.getLERBeamGas(j)-ValueBGLER[j];
+	  HERdownBG[j][i] = data.getHERBeamGas(j)-ValueBGHER[j];
+	}
       }
     }
 
     if(!found){
       name.push_back(sysName);
       
-      LERdownTous.push_back(data.getLERTouschek()-ValueTousLER);
-      HERdownTous.push_back(data.getHERTouschek()-ValueTousHER);
+      for(int j=0; j<nCh; j++){
+	LERdownTous[j].push_back(data.getLERTouschek(j)-ValueTousLER[j]);
+	HERdownTous[j].push_back(data.getHERTouschek(j)-ValueTousHER[j]);
 	
-      LERdownBG.push_back(data.getLERBeamGas()-ValueBGLER);
-      HERdownBG.push_back(data.getHERBeamGas()-ValueBGHER);
-
-      LERupTous.push_back(0);
-      HERupTous.push_back(0);
+	LERdownBG[j].push_back(data.getLERBeamGas(j)-ValueBGLER[j]);
+	HERdownBG[j].push_back(data.getHERBeamGas(j)-ValueBGHER[j]);
 	
-      LERupBG.push_back(0);
-      HERupBG.push_back(0);
+	LERupTous[j].push_back(0);
+	HERupTous[j].push_back(0);
+	
+	LERupBG[j].push_back(0);
+	HERupBG[j].push_back(0);
+      }
     }
   }
 
@@ -267,10 +308,10 @@ void addSystematicDown(TString sysName, dataSimRatio data){
  private:
 
   //the data/sim ratios
-  double ValueTousLER;
-  double ValueBGLER;
-  double ValueTousHER;
-  double ValueBGHER;
+  vector<double> ValueTousLER;
+  vector<double> ValueBGLER;
+  vector<double> ValueTousHER;
+  vector<double> ValueBGHER;
 
   double PScaleH;
   double PScaleL;
@@ -278,19 +319,21 @@ void addSystematicDown(TString sysName, dataSimRatio data){
   double PScaleHEr;
   double PScaleLEr;
 
+  int nCh;
+
   vector<TString> name;  //systematuc names 
 
   //LER uncertainties
-  vector<double> LERupTous;
-  vector<double> LERdownTous;
-  vector<double> LERupBG;
-  vector<double> LERdownBG;
+  vector< vector<double> > LERupTous;
+  vector< vector<double> > LERdownTous;
+  vector< vector<double> > LERupBG;
+  vector< vector<double> > LERdownBG;
 
   //HER uncertainties
-  vector<double> HERupTous;
-  vector<double> HERdownTous;
-  vector<double> HERupBG;
-  vector<double> HERdownBG;
+  vector< vector<double> > HERupTous;
+  vector< vector<double> > HERdownTous;
+  vector< vector<double> > HERupBG;
+  vector< vector<double> > HERdownBG;
 
 
 };

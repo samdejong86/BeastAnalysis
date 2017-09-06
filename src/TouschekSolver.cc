@@ -98,7 +98,8 @@ void TouschekSolver::draw(TGraphErrors *data, TH1F *Coulomb, TH1F *Touschek){
 
   // set axis titles, range
   hs->GetYaxis()->SetTitle(Coulomb->GetYaxis()->GetTitle());
-  hs->GetXaxis()->SetTitle("360mA                                    540mA                                    720mA            ");
+  if(Ring.Contains("LER")) hs->GetXaxis()->SetTitle("360mA                540mA                  720mA     ");
+  if(Ring.Contains("HER")) hs->GetXaxis()->SetTitle("320mA                480mA                  640mA     ");
   hs->GetXaxis()->SetRangeUser(0, X.GetNrows());
   hs->GetXaxis()->SetTitleOffset(1.2);
   hs->GetXaxis()->SetLabelSize(0.05);
