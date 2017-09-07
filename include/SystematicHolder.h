@@ -47,9 +47,9 @@ class SystematicHolder{
     out<<"------Systematic-Uncertainties------\n";
     for(int j=0; j<nCh; j++){
       if(badCh[j]) continue;
-      out<<j<<endl;
+      //out<<j<<endl;
       
-
+      if(!badHER[j]){
     out<<"HER Touschek. Value: "<<ValueTousHER[j]<<endl;
     out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
     for(int i=0; i<(int)name.size(); i++)
@@ -62,7 +62,9 @@ class SystematicHolder{
     for(int i=0; i<(int)name.size(); i++)
       out<<left<<setw(10)<<name[i]<<right<<setw(12)<<HERupBG[j][i] <<right<<setw(14)<<HERdownBG[j][i]<<endl;
     out<<endl<<endl;
+      }
 
+      if(!badLER[j]){
 
     out<<"LER Touschek. Value: "<<ValueTousLER[j]<<endl;
     out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
@@ -76,6 +78,8 @@ class SystematicHolder{
     for(int i=0; i<(int)name.size(); i++)
       out<<left<<setw(10)<<name[i]<<right<<setw(12)<<LERupBG[j][i] <<right<<setw(14)<<LERdownBG[j][i]<<endl;
     out<<endl<<endl;
+
+      }
     }
 
   }
@@ -98,6 +102,8 @@ class SystematicHolder{
       if(badCh[j]) continue;
 
     out<<"<"<<DataBranchName<<" value=\""<<j<<"\">"<<endl;                      //the start tag is <DetectorBranchName>
+
+    if(!badHER[j]){
 
     out<<"  <HER>"<<endl;                                     //start of HER background components
     out<<"    <PScale value=\""<<PScaleH<<"\">"<<endl;
@@ -136,6 +142,11 @@ class SystematicHolder{
     out<<"    </Beam_Gas>"<<endl;
     out<<"  </HER>"<<endl;                                   //end of HER
 
+    }
+
+    if(!badLER[j]){
+
+
     out<<"  <LER>"<<endl;                                    //start of LER
     out<<"    <PScale value=\""<<PScaleL<<"\">"<<endl;
     out<<"      "<<PScaleLEr<<endl;
@@ -173,6 +184,7 @@ class SystematicHolder{
     }
     out<<"    </Beam_Gas>"<<endl;
     out<<"  </LER>"<<endl;                   //end of LER
+    }
 
     out<<"</"<<DataBranchName<<">"<<endl;    //end of detector tag
 
@@ -191,28 +203,40 @@ class SystematicHolder{
   void setData(dataSimRatio data){
     for(int j=0; j<nCh; j++){
       if(badCh[j]) continue;
-
-      ValueTousHER[j] = data.getHERTouschek(j); 
-      ValueBGHER[j] = data.getHERBeamGas(j);
       
-      ValueTousLER[j]=data.getLERTouschek(j);
-      ValueBGLER[j] = data.getLERBeamGas(j);
+      
+      if(!badHER[j]){
+	ValueTousHER[j] = data.getHERTouschek(j); 
+	ValueBGHER[j] = data.getHERBeamGas(j);
+      }
+      
+      if(!badLER[j]){
+	ValueTousLER[j]=data.getLERTouschek(j);
+	ValueBGLER[j] = data.getLERBeamGas(j);
+      }
     }
-    /*
-   //add location uncertainty
-   name.push_back("Location");
-   LERupTous.push_back(data.getLERTouschekError());
-   HERupTous.push_back(data.getHERTouschekError());
-   LERdownBG.push_back(data.getLERBeamGasError());
-   HERdownBG.push_back(data.getHERBeamGasError());
-
-   LERdownTous.push_back(data.getLERTouschekError());
-   HERdownTous.push_back(data.getHERTouschekError());
-   LERupBG.push_back(data.getLERBeamGasError());
-   HERupBG.push_back(data.getHERBeamGasError());
-    */
+    
+    //add fit uncertainty
+    name.push_back("Fit");
+    for(int j=0; j<nCh; j++){
+      if(badCh[j]) continue;
+      if(!badLER[j]){
+	
+	LERupTous[j].push_back(data.getLERTouschekError(j));
+	LERdownBG[j].push_back(data.getLERBeamGasError(j));
+	LERupBG[j].push_back(data.getLERBeamGasError(j));
+	LERdownTous[j].push_back(data.getLERTouschekError(j));
+      }
+      
+      if(!badHER[j]){
+	HERdownTous[j].push_back(data.getHERTouschekError(j));
+	HERupTous[j].push_back(data.getHERTouschekError(j));
+	HERdownBG[j].push_back(data.getHERBeamGasError(j));
+	HERupBG[j].push_back(data.getHERBeamGasError(j));
+      }
+    }
   }
-
+  
   void setPScale(double PScaleHER, double PScaleLER){
     PScaleH=PScaleHER;
     PScaleL=PScaleLER;

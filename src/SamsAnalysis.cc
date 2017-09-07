@@ -35,6 +35,10 @@
 using namespace std;
 
 vector<int> badCh;
+vector<int> badHER;
+vector<int> badLER;
+
+#include "RatioError.h"
 
 #include "beamSim.h"  //a class
 #include "dataReader.h"   //a class
@@ -99,6 +103,9 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
 
   //determine the number of channels in this detector
   nC = getNumberOfChannels(DataBranchName, LERfile);
+
+  badHER.resize(nC);
+  badLER.resize(nC);
   
   //-------------1) Initial weighting of simulation-------------
 
@@ -163,47 +170,71 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
     solnHER[i].Solve(0);
     solnHER[i].calculateVariance();
 
+
+    double errorRatioHER=solnHER[i].getTousFitParameters()/solnHER[i].getTousError();
+    double errorRatioLER=solnLER[i].getTousFitParameters()/solnLER[i].getTousError();
+    
+    //cout<<i<<" "<<errorRatioHER<<" "<<errorRatioLER<<endl;
+    
+    if(errorRatioHER<1||solnHER[i].getTousFitParameters()==0||solnHER[i].getBGFitParameters()<0){
+      badHER[i]=1;
+    }
+
+    if(errorRatioLER<1||solnLER[i].getTousFitParameters()==0||solnLER[i].getBGFitParameters()<0){
+      badLER[i]=1;
+    }
+
+    if(!badLER[i]){
+      solnLER_sim[i].setVariables("LER", simLER.getYData(i), simLER.getErrors(i), simLER.getX(), true);
+      solnLER_sim[i].Solve(0);
+      solnLER_sim[i].calculateVariance();
+    }
    
-    solnLER_sim[i].setVariables("LER", simLER.getYData(i), simLER.getErrors(i), simLER.getX(), true);
-    solnLER_sim[i].Solve(0);
-    solnLER_sim[i].calculateVariance();
-    
-    
-    solnHER_sim[i].setVariables("HER", simHER.getYData(i), simHER.getErrors(i), simHER.getX(), true);
-    solnHER_sim[i].Solve(0);
-    solnHER_sim[i].calculateVariance();
-    
+    if(!badHER[i]){
+      solnHER_sim[i].setVariables("HER", simHER.getYData(i), simHER.getErrors(i), simHER.getX(), true);
+      solnHER_sim[i].Solve(0);
+      solnHER_sim[i].calculateVariance();
+    }
+
+
     ss<<i;
     TString ch = ss.str();
     ss.str("");
 
+    if(!badLER[i]){
     //draw solution and save to file
     solnLER[i].draw(dataLER.getGraph(i),histCouLER, histTouLER);
     TString imageFileLER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_LER_Data-"+ch;
     c1->Print(imageFileLER+"."+imageType);
 
-    solnHER[i].draw(dataHER.getGraph(i),histCouHER, histTouHER);
-    TString imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_Data-"+ch;
-    c1->Print(imageFileHER+"."+imageType);
-
     solnLER_sim[i].draw(simLER.getGraph(i),histCouLER, histTouLER);
     imageFileLER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_LER_Initial_Simulation-"+ch;
     c1->Print(imageFileLER+"."+imageType);
+    }
 
-    solnHER_sim[i].draw(simHER.getGraph(i),histCouHER, histTouHER);
-    imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_Initial_Simulation-"+ch;
-    c1->Print(imageFileHER+"."+imageType);
-
+    
+    if(!badHER[i]){
+      solnHER[i].draw(dataHER.getGraph(i),histCouHER, histTouHER);
+      TString imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_Data-"+ch;
+      c1->Print(imageFileHER+"."+imageType);
+      
+      solnHER_sim[i].draw(simHER.getGraph(i),histCouHER, histTouHER);
+      imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_Initial_Simulation-"+ch;
+      c1->Print(imageFileHER+"."+imageType);
+    }
 
   }
  
+  cout<<"reweight\n";
+  
+
   //-------------3) Re-weighting of simulation using data-simulation ratios-------------
 
   // get pscale scale factors
   double PScaleErrLER;
   double PScaleErrHER;
-  double PressureScaleLER = getWeights(solnLER, solnLER_sim, PScaleErrLER);
-  double PressureScaleHER = getWeights(solnHER, solnHER_sim, PScaleErrHER);
+  double PressureScaleLER = getWeights(solnLER, solnLER_sim, PScaleErrLER, badLER);
+  double PressureScaleHER = getWeights(solnHER, solnHER_sim, PScaleErrHER, badHER);
   
 		       
   //redo simulation, incorporating pscale factors
@@ -231,29 +262,32 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   for(int i=0; i<nC; i++){
     if(badCh[i]) continue;   
 
-   
-    solnLER_reSim[i].setVariables("LER", reSimLER.getYData(i), reSimLER.getErrors(i), reSimLER.getX(), true);
-    solnLER_reSim[i].Solve(solnLER_sim[i].getTousFitParameters());
-    solnLER_reSim[i].calculateVariance();
-    
-    
-    solnHER_reSim[i].setVariables("HER", reSimHER.getYData(i), reSimHER.getErrors(i), reSimHER.getX(), true);
-    solnHER_reSim[i].Solve(solnHER_sim[i].getTousFitParameters());
-    solnHER_reSim[i].calculateVariance();
-
+    if(!badLER[i]){
+      solnLER_reSim[i].setVariables("LER", reSimLER.getYData(i), reSimLER.getErrors(i), reSimLER.getX(), true);
+      solnLER_reSim[i].Solve(solnLER_sim[i].getTousFitParameters());
+      solnLER_reSim[i].calculateVariance();
+    }
+    if(!badHER[i]){
+      solnHER_reSim[i].setVariables("HER", reSimHER.getYData(i), reSimHER.getErrors(i), reSimHER.getX(), true);
+      solnHER_reSim[i].Solve(solnHER_sim[i].getTousFitParameters());
+      solnHER_reSim[i].calculateVariance();
+    }
      
     ss<<i;
     TString ch = ss.str();
     ss.str("");
 
-    solnLER_reSim[i].draw(reSimLER.getGraph(i),histCouHER, histTouHER);
-    TString imageFileLER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_LER_ReWeighted_Simulation-"+ch;
-    c1->Print(imageFileLER+"."+imageType);
-
-    solnHER_reSim[i].draw(reSimHER.getGraph(i),histCouHER, histTouHER);
-    TString imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_ReWeighted_Simulation-"+ch;
-    c1->Print(imageFileHER+"."+imageType); 
-
+    if(!badLER[i]){
+      solnLER_reSim[i].draw(reSimLER.getGraph(i),histCouHER, histTouHER);
+      TString imageFileLER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_LER_ReWeighted_Simulation-"+ch;
+      c1->Print(imageFileLER+"."+imageType);
+    }
+    
+    if(!badHER[i]){
+      solnHER_reSim[i].draw(reSimHER.getGraph(i),histCouHER, histTouHER);
+      TString imageFileHER = "figs/"+inputBranchName+forwardOrBackward+"/"+inputBranchName+forwardOrBackward+"_HER_ReWeighted_Simulation-"+ch;
+      c1->Print(imageFileHER+"."+imageType); 
+    }
 
   }
  
@@ -272,7 +306,7 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   Print(solnLER_sim, inputBranchName+forwardOrBackward, "LER", "Initial Simulation");
   Print(solnLER_reSim, inputBranchName+forwardOrBackward, "LER", "ReWeighted Simulation");
 
-
+  
   
   //4) fit the re-weighted simulation and get data/sim ratios for beam gas and Tousckek for HER and LER
   dataSimRatio ratios;

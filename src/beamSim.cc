@@ -89,6 +89,8 @@ TString beamSim::getSimBranchName(){
     return "CSI_dose";
   }else if(DataBranchName.Contains("DIA")){
     return "DIA_dose";
+  }else if(DataBranchName.Contains("CLW")){
+    return "CLAWS_rate";
   } else {
     cout<<"Making a guess\n";
       return DataBranchName;

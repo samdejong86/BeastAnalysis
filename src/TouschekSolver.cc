@@ -150,7 +150,8 @@ void TouschekSolver::Solve(double tousParam){
     f2->SetParameter(1, tousParam);
     f2->SetParLimits(1, 0.01*tousParam, 1.99*tousParam);
   }
-  
+
+    
   
   //add data and error to TGraph2DErrors
   TGraph2DErrors *gr = new TGraph2DErrors();

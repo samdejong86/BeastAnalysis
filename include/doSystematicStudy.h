@@ -52,13 +52,16 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
     //get the Touschek fit solution for each (good) channel
     for(int i=0; i<nC; i++){
       if(badCh[i]) continue;   
-            
+
+      if(!badLER[i]){            
       solnLERSystematic[i].setVariables("LER", LERSystematic.getYData(i), LERSystematic.getErrors(i), LERSystematic.getX(), true); 
       solnLERSystematic[i].Solve(solnLER_sim[i].getTousFitParameters());
-      
+      }
+
+      if(!badHER[i]){
       solnHERSystematic[i].setVariables("HER", HERSystematic.getYData(i), HERSystematic.getErrors(i), HERSystematic.getX(), true);
       solnHERSystematic[i].Solve(solnHER_sim[i].getTousFitParameters());
-            
+      }
     }
     
     //get the data/sim ratio
@@ -111,13 +114,14 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
   
     for(int i=0; i<nC; i++){
       if(badCh[i]) continue;   
-      
+      if(!badLER[i]){
       solnLERSystematic[i].setVariables("LER", LERSystematic2.getYData(i), LERSystematic2.getErrors(i), LERSystematic2.getX(), true);
       solnLERSystematic[i].Solve(solnLER_sim[i].getTousFitParameters());
-      
+      }
+      if(!badHER[i]){
       solnHERSystematic[i].setVariables("HER", HERSystematic2.getYData(i), HERSystematic2.getErrors(i), HERSystematic2.getX(), true);
       solnHERSystematic[i].Solve(solnHER_sim[i].getTousFitParameters());
-      
+      }
       
       
     }

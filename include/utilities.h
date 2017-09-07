@@ -1,6 +1,6 @@
 //get the number of channels in a branch
 int getNumberOfChannels(TString DataBranchName, TString dataFile){
-
+  
   TFile *f = new TFile(dataFile);
   TTree *tout = (TTree*)f->Get("tout");
 
@@ -14,6 +14,8 @@ int getNumberOfChannels(TString DataBranchName, TString dataFile){
   f->Close();
 
   delete branch;
+  cout<<dataFile<<endl;
+  cout<<n<<endl;
 
   return n;
 

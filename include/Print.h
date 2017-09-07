@@ -27,6 +27,10 @@ void Print(vector<TouschekSolver> soln, TString BranchName, TString Ring, TStrin
   
   for(int i=0; i<nC; i++){
     if(badCh[i]) continue;
+    if(Ring=="HER"&&badHER[i]) continue;
+    if(Ring=="LER"&&badLER[i]) continue;
+
+
     cout<<right<<setw(8)<<i<<soln[i]<<endl;
     
     out<<"\\hyperlink{"<<label<<"-"<<i<<"}{"<<i<<"}";

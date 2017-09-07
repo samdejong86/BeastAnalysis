@@ -26,10 +26,10 @@ class dataSimRatio{
   double getLERBeamGas(int c){return LERBeamGas[c];}
 
   //get location error
-  double getHERTouschekError(){return HERTouschekErr;}
-  double getHERBeamGasError(){return HERBeamGasErr;}
-  double getLERTouschekError(){return LERTouschekErr;}
-  double getLERBeamGasError(){return LERBeamGasErr;}
+  double getHERTouschekError(int c){return HERTouschekErr[c];}
+  double getHERBeamGasError(int c){return HERBeamGasErr[c];}
+  double getLERTouschekError(int c){return LERTouschekErr[c];}
+  double getLERBeamGasError(int c){return LERBeamGasErr[c];}
 
 
   //calculate data/sim ratio for HER or LER
@@ -38,17 +38,21 @@ class dataSimRatio{
     if(Ring=="LER"){
       LERTouschek.resize(data.size());
       LERBeamGas.resize(data.size());
+      LERTouschekErr.resize(data.size());
+      LERBeamGasErr.resize(data.size());
     }else if(Ring="HER"){
       HERTouschek.resize(data.size());
       HERBeamGas.resize(data.size());
+      HERTouschekErr.resize(data.size());
+      HERBeamGasErr.resize(data.size());
     }
 
 
     //calculate data/sim ratio for Touschek and beam-gas
     for(int i=0; i<(int)data.size(); i++){
       if(badCh[i]) continue;
-      
-
+      if(Ring=="HER"&&badHER[i]) continue;
+      if(Ring=="LER"&&badLER[i]) continue;
 
       
       double dataBG = data[i].getBGFitParameters();
@@ -59,15 +63,21 @@ class dataSimRatio{
        
       double Touschek = dataTous/simTous;
       double beamGas  = dataBG/simBG;
-  
-      
+
+      double errorTous = RatioError(dataTous, simTous, data[i].getTousError(), Sim[i].getTousError());
+      double errorBG = RatioError(dataBG, simBG, data[i].getBGError(), Sim[i].getBGError());
+       
     
       if(Ring=="LER"){
 	LERTouschek[i] = Touschek;
 	LERBeamGas[i] = beamGas;
+	LERTouschekErr[i] = errorTous;
+	LERBeamGasErr[i] = errorBG;
       }else if(Ring="HER"){
 	HERTouschek[i] = Touschek;
 	HERBeamGas[i] = beamGas;
+	HERTouschekErr[i] = errorTous;
+	HERBeamGasErr[i] = errorBG;
       }
     }
   }
@@ -79,10 +89,14 @@ class dataSimRatio{
     for(int i=0; i<HERTouschek.size(); i++){
       if(badCh[i]) continue;
       out<<"Channel "<<i<<endl;
+      if(!badHER[i]){
       out<<"HER: \ndata/sim for Touschek:  "<<HERTouschek[i]<<endl;
       out<<"data/sim for Beam Gas:  "<<HERBeamGas[i]<<endl<<endl;
+      }
+      if(!badLER[i]){
       out<<"LER: \ndata/sim for Touschek:  "<<LERTouschek[i]<<endl;
       out<<"data/sim for Beam Gas:  "<<LERBeamGas[i]<<endl; 
+      }
     }
   }
 
@@ -93,10 +107,11 @@ class dataSimRatio{
   vector<double> LERBeamGas;
 
 
-  double HERTouschekErr;
-  double LERTouschekErr;
-  double HERBeamGasErr;
-  double LERBeamGasErr;
+  vector<double> HERTouschekErr;
+  vector<double> LERTouschekErr;
+  vector<double> HERBeamGasErr;
+  vector<double> LERBeamGasErr;
+
 
 };
 

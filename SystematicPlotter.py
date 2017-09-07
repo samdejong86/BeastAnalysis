@@ -1,9 +1,5 @@
 #!/usr/bin/python
 
-# coding: utf-8
-
-# In[5]:
-
 #import relevant libraries`
 import math
 import numpy as np
@@ -22,8 +18,6 @@ root = tree.getroot()
 import pandas as pd
 
 
-# In[6]:
-
 #set plot directory, make it if it doesn't exist
 PlotDir='figs/Results'
 
@@ -36,7 +30,6 @@ beast=True
 show=True
 
 
-# In[ ]:
 
 # for use in batch mode
 if len(sys.argv) == 4:
@@ -111,17 +104,13 @@ style = belle2style_mpl.b2_style_mpl()  #style created by Michael Hedges to matc
 plt.style.use(style)
 
 #my colours
-TColour = "#000000"
-GColour = "#000000"
 HERColour = "#000000"
 LERColour = "#000000"
 
 #the beast colours
 if beast:
-    TColour = "#000000"
-    GColour = "#000000"
-    HERColour = "#000000"
-    LERColour = "#000000"
+    HERColour = "#0000FF"
+    LERColour = "#FF0000"
 
 
 
@@ -145,15 +134,13 @@ for source in 'Beam Gas', 'Touschek':
     #select appropriate data from the data frame
     AFrame=HERLER.loc[lambda df: (df.Source == source), :] 
         
-    #The Touschek plot is the top half, beam gas is the bottom half
-    ThisColour=TColour
+    
     xlabel='$O_{bg}^{data}/O_{bg}^{sim}$'
     if source == 'Beam Gas':
         ax = mainAx
         plt.setp(ax.get_xticklabels(), visible=False)
     elif source == 'Touschek':
         ax = plt.subplot(212, sharex=mainAx)
-        ThisColour=GColour
         xlabel='$O_{T}^{data}/O_{T}^{sim}$'            
         plt.setp(ax.get_xticklabels(), visible=True)
 
@@ -163,11 +150,11 @@ for source in 'Beam Gas', 'Touschek':
         HFrame=HERLER.loc[lambda df: (df.Beam == beam), :].loc[lambda df: (df.Source == source), :] 
     
     
-        c='#0000FF'
+        c=HERColour
         m='^'
         o=Hoffset
         if beam == 'LER':
-            c='#FF0000'
+            c=LERColour
             m='o'
             o=Loffset
         
@@ -291,7 +278,7 @@ for beam in 'HER', 'LER':
         
 
     #plot data
-    sns.stripplot(Frame.PScale, Frame.Detector , jitter=False, size=10, color=ThisColour, linewidth=0)
+    sns.stripplot(Frame.PScale, Frame.Detector , jitter=False, size=10, color='black', linewidth=0)
 
     #add error abrs
     for y,ylabel in zip(ax.get_yticks(), ax.get_yticklabels()):
@@ -302,7 +289,7 @@ for beam in 'HER', 'LER':
                     #ls='none', 
                     elinewidth=2,
                     capthick=2,
-                    color=ThisColour)
+                    color='black')
 
     #set axis titles
     plt.ylabel(beam)
@@ -335,7 +322,6 @@ for beam in 'HER', 'LER':
         sns.plt.show()
 
 
-# In[ ]:
 
 
 
