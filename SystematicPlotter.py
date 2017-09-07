@@ -39,6 +39,7 @@ if len(sys.argv) == 4:
         show=False
     imageType=sys.argv[3]
 
+
 #read the xml data into a pandas dataframe
 Data=[]
 PS=[]
@@ -46,14 +47,25 @@ for Detector in root:
     det=""
     if Detector.tag=="LYSO_hitRate_forward":
         det="Forward LYSO"
-    if Detector.tag=="CSI_Pure_hitRate_forward":
+    elif Detector.tag=="CSI_Pure_hitRate_forward":
         det="Forward Pure CSI"
-    if Detector.tag=="BGO_dose_forward":
-        det="Forward BGO"
-    if Detector.tag=="BGO_dose_backward":
+    elif Detector.tag=="LYSO_hitRate_backward":
+        det="Backward LYSO"
+    elif Detector.tag=="CSI_Pure_hitRate_backward":
+        det="Backward Pure CSI"
+    elif Detector.tag=="BGO_dose_forward":
+        det="Forward BGO"        
+    elif Detector.tag=="BGO_dose_backward":
         det="Backward BGO"
-    if Detector.tag=="HE3_rate":
+    elif Detector.tag=="HE3_rate":
         det="$^3He$ tube"
+    elif Detector.tag=="DIA_dose":
+        det="Diamond"
+    elif Detector.tag=="PIN_dose":
+        det="PIN"
+    else:
+        det=Detector.tag
+    
         
     ch=Detector.attrib['value']    
 
@@ -80,6 +92,17 @@ for Detector in root:
                                         
                 value= float(BGSource.attrib['value'])
             
+            if sumdown==0 or sumup==0:
+                value=1e-10
+                sumup=0
+                sumdown=0
+            elif value/math.sqrt(sumdown)<1.03 or value/math.sqrt(sumup)<1.02:
+                value=1e-10
+                sumup=0
+                sumdown=0
+                
+                
+            
             Data.append([Beam.tag.replace('_', ' '), BGSource.tag.replace('_', ' '), det, ch, value, math.sqrt(sumdown), math.sqrt(sumup)])
            
         
@@ -89,7 +112,8 @@ HERLER = pd.DataFrame(Data, columns=['Beam', 'Source', 'Detector', 'Channel', 'r
 #Create a PScale dataframe
 PScale = pd.DataFrame(PS, columns=['Beam', 'Detector', 'PScale', 'Error'])
 
-#print HERLER
+print HERLER
+
 
 #import matplotlib
 import matplotlib as mpl
@@ -114,14 +138,16 @@ if beast:
 
 
 
+#the font I'm using doesn't have a character for ^-, so I have to redefine how the axis is labeled
+
 from matplotlib.ticker import FuncFormatter
 
 def labeller(x, pos):
     return '10$^{'+str(int(np.log10(x)))+'}$'
+    
+    
 
-
-
-   
+    
 plt.figure(figsize=(800/80, 800/80))
 
 mainAx = plt.subplot(211)
@@ -132,16 +158,16 @@ Loffset=0.1875
 #loop over Touschek and beam gas
 for source in 'Beam Gas', 'Touschek':
     #select appropriate data from the data frame
-    AFrame=HERLER.loc[lambda df: (df.Source == source), :] 
+    #AFrame=HERLER.loc[lambda df: (df.Source == source), :] 
         
-    
-    xlabel='$O_{bg}^{data}/O_{bg}^{sim}$'
+    #The Touschek plot is the top half, beam gas is the bottom half
+    xlabel='$\mathcal{O}_{bg}^{data}/\mathcal{O}_{bg}^{sim}$'
     if source == 'Beam Gas':
         ax = mainAx
-        plt.setp(ax.get_xticklabels(), visible=False)
+        plt.setp(ax.get_xticklabels(), visible=True)
     elif source == 'Touschek':
         ax = plt.subplot(212, sharex=mainAx)
-        xlabel='$O_{T}^{data}/O_{T}^{sim}$'            
+        xlabel='$\mathcal{O}_{T}^{data}/\mathcal{O}_{T}^{sim}$'            
         plt.setp(ax.get_xticklabels(), visible=True)
 
         
@@ -149,6 +175,7 @@ for source in 'Beam Gas', 'Touschek':
     
         HFrame=HERLER.loc[lambda df: (df.Beam == beam), :].loc[lambda df: (df.Source == source), :] 
     
+        
     
         c=HERColour
         m='^'
@@ -159,8 +186,8 @@ for source in 'Beam Gas', 'Touschek':
             o=Loffset
         
         #plot data
-    #sns.stripplot(x="ratio", y="Detector", hue="Beam", data=AFrame, jitter=False, split=True, size=10, marker='o', edgecolor=['#FF0000','#0000FF'], linewidth=1)
-        sns.stripplot(HFrame.ratio, HFrame.Detector , jitter=False, size=10, marker=m,edgecolor=c, linewidth=1)
+        #sns.stripplot(x="ratio", y="Detector", hue="Beam", data=AFrame, jitter=False, split=True, size=10, marker='o', edgecolor=['#FF0000','#0000FF'], linewidth=1)
+        sns.stripplot(HFrame.ratio, HFrame.Detector , jitter=False, size=15, marker=m,edgecolor=c, linewidth=1)
   
         for y,ylabel in zip(ax.get_yticks(), ax.get_yticklabels()):
             f = HFrame['Detector'] == ylabel.get_text() 
@@ -168,7 +195,7 @@ for source in 'Beam Gas', 'Touschek':
                         np.ones_like(HFrame.ratio[f].values)*(y+o), 
                         xerr=[HFrame.lowerror[f].values, HFrame.uppererror[f].values], 
                         alpha=.25,
-                        elinewidth=10,
+                        elinewidth=15,
                         capthick=0,
                         color=c,
                         linewidth=0)
@@ -179,19 +206,20 @@ for source in 'Beam Gas', 'Touschek':
            
         offsets=point.get_offsets()
         o=Loffset
+    
         if point.get_edgecolors()[0][0]<0.5:
             o=Hoffset
        
+    
         
         for i in range(0,len(offsets)):
             offsets[i][1] = offsets[i][1]+o
-            
 
+            
+            
         point.set_offsets(offsets)
-
-
         
-            
+
         
         
      
@@ -206,7 +234,7 @@ for source in 'Beam Gas', 'Touschek':
     ax.set_xscale("log", nonposx='clip')
 
     ax.set_xlim(0.01, 10000)
-    ax.set_ylim(4.5, -0.5)
+    ax.set_ylim(7.5, -0.5)
         
     #set ticks pointing in
         
@@ -244,18 +272,11 @@ for source in 'Beam Gas', 'Touschek':
     plt.tight_layout()
     
     #save plot
-    plt.savefig(PlotDir+'/RatioPlot.'+imageType)
+plt.savefig(PlotDir+'/RatioPlot.'+imageType)
               
     #show plot
 if show:
     sns.plt.show()
-
-
-
-
-
-
-
 
 
 
@@ -303,6 +324,12 @@ for beam in 'HER', 'LER':
     ax.tick_params(direction='in', pad=15)
     ax.tick_params(which='minor', direction='in', pad=15)
         
+    plt.tick_params(axis='y',          # changes apply to the x-axis
+                which='minor',      # both major and minor ticks are affected
+                left='off',      # ticks along the bottom edge are off
+                right='off') # labels along the bottom edge are off   
+        
+        
     #don't add grid if belle style is requested
     if beast==False:
         ax.grid(True)
@@ -318,8 +345,11 @@ for beam in 'HER', 'LER':
     plt.savefig(PlotDir+'/'+beam+'PScale.'+imageType)
               
     #show plot
-    if show:
-        sns.plt.show()
+if show:
+    sns.plt.show()
+
+
+
 
 
 
