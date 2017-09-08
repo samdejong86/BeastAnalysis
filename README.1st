@@ -15,7 +15,7 @@ Compiling:
 Usage:
 	SamsAnalysis subdetector forwardOrBackward
      	   subdetector can be any BEAST II subdetector branch, eg BGO_dose
-	   	 note: subdetector can aslo be LYSO_hitRate or CSI_Doped_hitRate, which performs the analysis only on the LYSO or doped CSI channels of CSI_hitRate
+	   	 note: subdetector can aslo be LYSO_hitRate or CSI_Pure_hitRate, which performs the analysis only on the LYSO or pure CSI channels of CSI_hitRate
 	   forwardOrBackward can be forward, backward, or be omitted
 	  
 	python SystematicPlotter.py
@@ -31,10 +31,12 @@ Usage:
 	   performs analysis for:
 	   	    LYSO_hitRate
 		    CSI_Doped_hitRate
+		    SCI_rate
+		    PIN_dose
 		    BGO_dose
 		    HE3_rate
  	   runs SystematicPlotter.py
-	   compiles the beamer slides
+	   
 
 ---------------------------------------------------------------------------------------------------------------
 Files included in repository:
