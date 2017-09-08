@@ -8,14 +8,20 @@ int getNumberOfChannels(TString DataBranchName, TString dataFile){
 
   tout->SetBranchAddress(DataBranchName, &branch);
 
-  tout->GetEntry(2);
-  int n = branch->size();
+  int n=0;
+  for(int i=0; i<100; i++){
+     tout->GetEntry(i);
+     if(n<branch->size()) n=branch->size();
+
+  }
+
+ 
   
   f->Close();
 
   delete branch;
-  cout<<dataFile<<endl;
-  cout<<n<<endl;
+  //cout<<dataFile<<endl;
+  //cout<<n<<endl;
 
   return n;
 

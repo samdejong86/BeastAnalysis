@@ -86,8 +86,9 @@ class dataSimRatio{
   void printOn(ostream & out) const{
 
     out<<"\n\n------------Results------------\n";
-    for(int i=0; i<HERTouschek.size(); i++){
+    for(int i=0; i<(int)HERTouschek.size(); i++){
       if(badCh[i]) continue;
+      if(badHER[i]&&badLER[i]) continue;
       out<<"Channel "<<i<<endl;
       if(!badHER[i]){
       out<<"HER: \ndata/sim for Touschek:  "<<HERTouschek[i]<<endl;

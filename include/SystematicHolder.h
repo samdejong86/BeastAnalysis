@@ -47,6 +47,7 @@ class SystematicHolder{
     out<<"------Systematic-Uncertainties------\n";
     for(int j=0; j<nCh; j++){
       if(badCh[j]) continue;
+      if(badHER[j]&&badLER[j]) continue;
       //out<<j<<endl;
       
       if(!badHER[j]){
@@ -100,7 +101,7 @@ class SystematicHolder{
 
     for(int j=0; j<nCh; j++){
       if(badCh[j]) continue;
-
+      if(badHER[j]&&badLER[j]) continue;
     out<<"<"<<DataBranchName<<" value=\""<<j<<"\">"<<endl;                      //the start tag is <DetectorBranchName>
 
     if(!badHER[j]){

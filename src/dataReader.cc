@@ -133,6 +133,8 @@ void dataReader::readRunTimes(){
 void dataReader::readData(){
   readRunTimes();
 
+  //cout<<"read\n";
+
   //open file, get ttree
   TFile *f = new TFile(inputFile);  
   TTree *tout = (TTree*)f->Get("tout");

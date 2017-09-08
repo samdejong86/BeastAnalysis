@@ -104,6 +104,8 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   //determine the number of channels in this detector
   nC = getNumberOfChannels(DataBranchName, LERfile);
 
+  cout<<nC<<endl;
+
   badHER.resize(nC);
   badLER.resize(nC);
   
@@ -224,9 +226,7 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
     }
 
   }
- 
-  cout<<"reweight\n";
-  
+   
 
   //-------------3) Re-weighting of simulation using data-simulation ratios-------------
 

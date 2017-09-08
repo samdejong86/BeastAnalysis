@@ -66,12 +66,13 @@ beamSim::beamSim(TString file, TString DataBranch, int nCh){
   
   Efficiencies.resize(nCh);
   for(int i=0; i<nCh; i++) Efficiencies[i]=1;
-  if(DataBranch.Contains("BGO")){
+  if(DataBranch.Contains("BGO"))
     for(int i=0; i<nCh; i++) Efficiencies[i]=5.11e-5;
-    //Efficiencies[0] = 0.278;
-    //Efficiencies[1] = 0.201;
-    //Efficiencies[2] = 0.154;
-    //Efficiencies[3] = 0.282;
+  if(DataBranch.Contains("HE3")){
+    Efficiencies[0] = 0.278;
+    Efficiencies[1] = 0.201;
+    Efficiencies[2] = 0.154;
+    Efficiencies[3] = 0.282;
   }
   currentPerturb=0;
   beamSizePerturb=0;
@@ -91,6 +92,8 @@ TString beamSim::getSimBranchName(){
     return "DIA_dose";
   }else if(DataBranchName.Contains("CLW")){
     return "CLAWS_rate";
+  }else if(DataBranchName.Contains("SCI_rate")){
+    return "QCSS_rate";
   } else {
     cout<<"Making a guess\n";
       return DataBranchName;
@@ -135,6 +138,7 @@ void beamSim::getSimBeamPars(){
   truth->SetBranchAddress("MC_LT_"+SimBranchName,   &MC_LT_rate);
   truth->SetBranchAddress("MC_HT_"+SimBranchName,   &MC_HT_rate);
   
+
   vector<double> *MC_LC_rate[12];  //LC = LER Coulomb
   vector<double> *MC_HC_rate[12];  //HC = HER Coulomb
   vector<double> *MC_LB_rate[12];  //LB = LER Brems
@@ -160,8 +164,13 @@ void beamSim::getSimBeamPars(){
   
   truth->GetEntry(0);
   double Zef=7;  //Zeff in the simulation is always 7.
-  
+
+  for(int i=0; i<12; i++) cout<<MC_LC_rate[i]->size()<<endl;
+ 
+  //cout<<"MC_HT_"+SimBranchName<<endl;
+
   for(int i=0; i<(int)MC_LT_rate->size(); i++){
+  //for(int i=0; i<6; i++){
     ParamLT.at(i) = MC_LT_rate->at(i)*SAD_sigma_LER->at(0)*SAD_bunchNB_LER->at(0)/(SAD_I_LER->at(0)*SAD_I_LER->at(0));
     ParamHT.at(i) = MC_HT_rate->at(i)*SAD_sigma_HER->at(0)*SAD_bunchNB_HER->at(0)/(SAD_I_HER->at(0)*SAD_I_HER->at(0));;
     

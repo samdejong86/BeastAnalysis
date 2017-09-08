@@ -110,9 +110,9 @@ for Detector in root:
 HERLER = pd.DataFrame(Data, columns=['Beam', 'Source', 'Detector', 'Channel', 'ratio', 'lowerror', 'uppererror'])
 
 #Create a PScale dataframe
-PScale = pd.DataFrame(PS, columns=['Beam', 'Detector', 'PScale', 'Error'])
+PScale = pd.DataFrame(PS, columns=['Beam', 'Detector', 'PScale', 'Error']).drop_duplicates()
 
-print HERLER
+#print HERLER
 
 
 #import matplotlib
