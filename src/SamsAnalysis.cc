@@ -69,6 +69,8 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   cout<<"Not using Belle II style\n";
   #endif
 
+  cout<<"Running on "<<DataBranchName<<" "<<forwardOrBackward<<endl;
+
   //set style
   thisStyle();
 
@@ -190,12 +192,20 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
       solnLER_sim[i].setVariables("LER", simLER.getYData(i), simLER.getErrors(i), simLER.getX(), true);
       solnLER_sim[i].Solve(0);
       solnLER_sim[i].calculateVariance();
+      if(solnLER_sim[i].getBGFitParameters()<=0){
+	badLER[i]=1;
+      }
+
     }
    
     if(!badHER[i]){
       solnHER_sim[i].setVariables("HER", simHER.getYData(i), simHER.getErrors(i), simHER.getX(), true);
       solnHER_sim[i].Solve(0);
       solnHER_sim[i].calculateVariance();
+
+      if(solnHER_sim[i].getBGFitParameters()<=0){
+	badHER[i]=1;
+      }
     }
 
 
@@ -312,8 +322,11 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   dataSimRatio ratios;
 
 
-  ratios.addRatios(solnLER, solnLER_reSim, "LER");
-  ratios.addRatios(solnHER, solnHER_reSim, "HER");
+  //ratios.addRatios(solnLER, solnLER_reSim, "LER");
+  //ratios.addRatios(solnHER, solnHER_reSim, "HER");
+  ratios.addRatios(dataLER, reSimLER, "LER", nC);
+  ratios.addRatios(dataHER, reSimHER, "HER", nC);
+  
 
 
   cout<<"\n\n----Reweighting-Factors----\n";
@@ -335,7 +348,7 @@ void doIt(TString DataBranchName, TString forwardOrBackward = ""){
   Systematics.setPScaleError(PScaleErrHER, PScaleErrLER);
   
   
-  doSystematicStudy(solnHER, solnLER, Systematics, solnHER_sim, solnLER_sim, PScaleErrHER, PScaleErrLER);
+  doSystematicStudy(Systematics, solnHER_sim, solnLER_sim, PScaleErrHER, PScaleErrLER);
   
   //print systematic uncertainties to console
   cout<<endl<<endl;

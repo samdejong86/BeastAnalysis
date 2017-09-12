@@ -1,5 +1,8 @@
 //get the number of channels in a branch
 int getNumberOfChannels(TString DataBranchName, TString dataFile){
+
+  //if(DataBranchName=="CLW_N_MIPs_offline")
+  //return 3;
   
   TFile *f = new TFile(dataFile);
   TTree *tout = (TTree*)f->Get("tout");

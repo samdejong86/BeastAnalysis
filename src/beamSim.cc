@@ -66,14 +66,15 @@ beamSim::beamSim(TString file, TString DataBranch, int nCh){
   
   Efficiencies.resize(nCh);
   for(int i=0; i<nCh; i++) Efficiencies[i]=1;
+  
   if(DataBranch.Contains("BGO"))
     for(int i=0; i<nCh; i++) Efficiencies[i]=5.11e-5;
-  if(DataBranch.Contains("HE3")){
+  /*if(DataBranch.Contains("HE3")){
     Efficiencies[0] = 0.278;
     Efficiencies[1] = 0.201;
     Efficiencies[2] = 0.154;
     Efficiencies[3] = 0.282;
-  }
+    }*/
   currentPerturb=0;
   beamSizePerturb=0;
   PScalePerturb=0;
@@ -119,11 +120,11 @@ void beamSim::getSimBeamPars(){
   truth->SetBranchAddress("SAD_I_LER", &SAD_I_LER);
   truth->SetBranchAddress("SAD_P_HER", &SAD_P_HER);
   truth->SetBranchAddress("SAD_P_LER", &SAD_P_LER);
-  truth->SetBranchAddress("SAD_sigma_HER", &SAD_sigma_HER);
-  truth->SetBranchAddress("SAD_sigma_LER", &SAD_sigma_LER);
+  //truth->SetBranchAddress("SAD_sigma_HER", &SAD_sigma_HER);
+  //truth->SetBranchAddress("SAD_sigma_LER", &SAD_sigma_LER);
   
-  //truth->SetBranchAddress("SAD_sigma_y_HER", &SAD_sigma_HER);
-  //truth->SetBranchAddress("SAD_sigma_y_LER", &SAD_sigma_LER);
+  truth->SetBranchAddress("SAD_sigma_y_HER", &SAD_sigma_HER);
+  truth->SetBranchAddress("SAD_sigma_y_LER", &SAD_sigma_LER);
   
   
   truth->SetBranchAddress("SAD_bunchNb_HER", &SAD_bunchNB_HER);
@@ -165,11 +166,11 @@ void beamSim::getSimBeamPars(){
   truth->GetEntry(0);
   double Zef=7;  //Zeff in the simulation is always 7.
 
-  for(int i=0; i<12; i++) cout<<MC_LC_rate[i]->size()<<endl;
+  //for(int i=0; i<12; i++) cout<<MC_LC_rate[i]->size()<<endl;
  
   //cout<<"MC_HT_"+SimBranchName<<endl;
 
-  for(int i=0; i<(int)MC_LT_rate->size(); i++){
+  for(int i=0; i<nChannels; i++){
   //for(int i=0; i<6; i++){
     ParamLT.at(i) = MC_LT_rate->at(i)*SAD_sigma_LER->at(0)*SAD_bunchNB_LER->at(0)/(SAD_I_LER->at(0)*SAD_I_LER->at(0));
     ParamHT.at(i) = MC_HT_rate->at(i)*SAD_sigma_HER->at(0)*SAD_bunchNB_HER->at(0)/(SAD_I_HER->at(0)*SAD_I_HER->at(0));;
@@ -181,6 +182,10 @@ void beamSim::getSimBeamPars(){
       ParamHBGall.at(i)[j] = (MC_HC_rate[j]->at(i)+MC_HB_rate[j]->at(i))/(SAD_P_HER->at(0)*133.32e-9*SAD_I_HER->at(0)*Zef*Zef);
       
     }
+  }
+
+  for(int i=0; i<nChannels; i++){
+    cout<<ParamLT[i]<<"\t"<<ParamHT[i]<<endl;
   }
   
   //close the truth file.
@@ -297,8 +302,10 @@ void beamSim::Simulate(TString inputFile, TString outfilename){
       
       }
     outtree->Fill();
-    
+
+       
   }
+  
   
   
   outtree->Write();

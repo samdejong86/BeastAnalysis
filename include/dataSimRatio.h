@@ -14,70 +14,68 @@ class dataSimRatio{
 }
 
   //set the ratio
-  void setHERTouschek(double num, int ch){HERTouschek[ch]=num;}
-  void setHERBeamGas(double num, int ch){HERBeamGas[ch]=num;}
-  void setLERTouschek(double num, int ch){LERTouschek[ch]=num;}
-  void setLERBeamGas(double num, int ch){LERBeamGas[ch]=num;}
 
   //get the ratio
-  double getHERTouschek(int c){return HERTouschek[c];}
-  double getHERBeamGas(int c){return HERBeamGas[c];}
-  double getLERTouschek(int c){return LERTouschek[c];}
-  double getLERBeamGas(int c){return LERBeamGas[c];}
+  double getHER(int c){return HER[c];}
+  double getLER(int c){return LER[c];}
 
   //get location error
-  double getHERTouschekError(int c){return HERTouschekErr[c];}
-  double getHERBeamGasError(int c){return HERBeamGasErr[c];}
-  double getLERTouschekError(int c){return LERTouschekErr[c];}
-  double getLERBeamGasError(int c){return LERBeamGasErr[c];}
+  double getHERError(int c){return HERErr[c];}
+  double getLERError(int c){return LERErr[c];}
 
 
   //calculate data/sim ratio for HER or LER
-  void addRatios(vector<TouschekSolver> data, vector<TouschekSolver> Sim, TString Ring){
+  void addRatios(dataReader data, dataReader Sim, TString Ring, int nChannels){
     
     if(Ring=="LER"){
-      LERTouschek.resize(data.size());
-      LERBeamGas.resize(data.size());
-      LERTouschekErr.resize(data.size());
-      LERBeamGasErr.resize(data.size());
+      LER.resize(nChannels);
+      LERErr.resize(nChannels);
     }else if(Ring="HER"){
-      HERTouschek.resize(data.size());
-      HERBeamGas.resize(data.size());
-      HERTouschekErr.resize(data.size());
-      HERBeamGasErr.resize(data.size());
+      HER.resize(nChannels);
+      HERErr.resize(nChannels);
     }
 
 
     //calculate data/sim ratio for Touschek and beam-gas
-    for(int i=0; i<(int)data.size(); i++){
+    for(int i=0; i<nChannels; i++){
       if(badCh[i]) continue;
       if(Ring=="HER"&&badHER[i]) continue;
       if(Ring=="LER"&&badLER[i]) continue;
 
       
-      double dataBG = data[i].getBGFitParameters();
-      double dataTous = data[i].getTousFitParameters();
-      
-      double simBG = Sim[i].getBGFitParameters();
-      double simTous = Sim[i].getTousFitParameters();
-       
-      double Touschek = dataTous/simTous;
-      double beamGas  = dataBG/simBG;
+      TGraphErrors *d = data.getGraph(i);
+      TGraphErrors *s = Sim.getGraph(i);
 
-      double errorTous = RatioError(dataTous, simTous, data[i].getTousError(), Sim[i].getTousError());
-      double errorBG = RatioError(dataBG, simBG, data[i].getBGError(), Sim[i].getBGError());
+      double dataPt, simPt;
+      double x;
+      double dataSum=0;
+      double simSum=0;
+      
+      double errSumData=0;
+      double errSimSum=0;
+      
+      for(int j=0; j<d->GetN(); j++){
+	d->GetPoint(j, x, dataPt);
+	s->GetPoint(j, x, simPt);
+	dataSum+=dataPt;
+	simSum+=simPt;
+
+	errSumData += pow(d->GetErrorY(j),2);
+	errSimSum += pow(s->GetErrorY(j),2);
+
+      }
+      
+      double ratio= dataSum/simSum;    
+
+      double errorRatio = RatioError(dataSum, simSum, errSumData, errSimSum);
        
     
       if(Ring=="LER"){
-	LERTouschek[i] = Touschek;
-	LERBeamGas[i] = beamGas;
-	LERTouschekErr[i] = errorTous;
-	LERBeamGasErr[i] = errorBG;
+	LER[i] = ratio;
+	LERErr[i] = errorRatio;
       }else if(Ring="HER"){
-	HERTouschek[i] = Touschek;
-	HERBeamGas[i] = beamGas;
-	HERTouschekErr[i] = errorTous;
-	HERBeamGasErr[i] = errorBG;
+	HER[i] = ratio;
+	HERErr[i] = errorRatio;
       }
     }
   }
@@ -86,32 +84,25 @@ class dataSimRatio{
   void printOn(ostream & out) const{
 
     out<<"\n\n------------Results------------\n";
-    for(int i=0; i<(int)HERTouschek.size(); i++){
+    for(int i=0; i<(int)HER.size(); i++){
       if(badCh[i]) continue;
       if(badHER[i]&&badLER[i]) continue;
       out<<"Channel "<<i<<endl;
       if(!badHER[i]){
-      out<<"HER: \ndata/sim for Touschek:  "<<HERTouschek[i]<<endl;
-      out<<"data/sim for Beam Gas:  "<<HERBeamGas[i]<<endl<<endl;
+      out<<"HER: \ndata/sim:  "<<HER[i]<<endl;
       }
       if(!badLER[i]){
-      out<<"LER: \ndata/sim for Touschek:  "<<LERTouschek[i]<<endl;
-      out<<"data/sim for Beam Gas:  "<<LERBeamGas[i]<<endl; 
+      out<<"LER: \ndata/sim:  "<<LER[i]<<endl;
       }
     }
   }
 
  private:
-  vector<double> HERTouschek;
-  vector<double> LERTouschek;
-  vector<double> HERBeamGas;
-  vector<double> LERBeamGas;
+  vector<double> HER;
+  vector<double> LER;
 
-
-  vector<double> HERTouschekErr;
-  vector<double> LERTouschekErr;
-  vector<double> HERBeamGasErr;
-  vector<double> LERBeamGasErr;
+  vector<double> HERErr;
+  vector<double> LERErr;
 
 
 };

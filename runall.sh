@@ -2,10 +2,14 @@ rm data/Systematics.xml
 rm tex/*_*.tex
 rm -r figs/*
 
+./SamsAnalysis CLW_N_MIPs_offline
+
 ./SamsAnalysis SCI_rate
 
 ./SamsAnalysis BGO_dose forward
 ./SamsAnalysis BGO_dose backward
+
+./SamsAnalysis DIA_dose
 
 ./SamsAnalysis PIN_dose
 

@@ -7,7 +7,7 @@
       ../ntuples/v3/BEAST_run300789.root
     </LERfile>
     <SimulationReference>
-      ../ntuples/Sim_v3/mc_beast_run_2005.root
+      ../ntuples/Sim_v5.3/mc_beast_run_2005.root
     </SimulationReference>
     <HERSubRunStartTimes>
       1463446682,1463446972,1463447940,1463447700,1463447412,1463449800,1463450020,1463450420,1463451120,1463450810,1463452110,1463452360,1463453760,1463452710,1463453160

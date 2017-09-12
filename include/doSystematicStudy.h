@@ -5,13 +5,19 @@
  */
 
 
-void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &solnLER, SystematicHolder &Systematics, vector<TouschekSolver> &solnHER_sim, vector<TouschekSolver> &solnLER_sim, double PScaleHERErr, double PScaleLERErr){
+void doSystematicStudy(SystematicHolder &Systematics, vector<TouschekSolver> &solnHER_sim, vector<TouschekSolver> &solnLER_sim, double PScaleHERErr, double PScaleLERErr){
 
   TString HERfile = inputs.getStringValue("HERfile");
   TString LERfile = inputs.getStringValue("LERfile");
 
   int nC = Params.getNChannels();
   TString DataBranchName = Params.getDataBranchName();
+
+  
+  dataReader LER(LERfile, DataBranchName, "LER", nC);
+  dataReader HER(HERfile, DataBranchName, "HER", nC);
+  LER.readData();
+  HER.readData();
 
 
   //loop over three systematics: current, beam size, and PScale
@@ -66,8 +72,8 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
     
     //get the data/sim ratio
     dataSimRatio ratios;
-    ratios.addRatios(solnLER,solnLERSystematic, "LER");
-    ratios.addRatios(solnHER,solnHERSystematic, "HER");
+    ratios.addRatios(LER,LERSystematic, "LER", nC);
+    ratios.addRatios(HER,HERSystematic, "HER",nC);
         
     
     //delete the temporary files
@@ -126,8 +132,8 @@ void doSystematicStudy(vector<TouschekSolver> &solnHER, vector<TouschekSolver> &
       
     }
     
-    ratios.addRatios(solnLER,solnLERSystematic, "LER");
-    ratios.addRatios(solnHER,solnHERSystematic, "HER");
+    ratios.addRatios(LER,LERSystematic2, "LER", nC);
+    ratios.addRatios(HER,HERSystematic2, "HER", nC);
         
     //add the down systematic, then reset the perturbations.
     if(q==0){
