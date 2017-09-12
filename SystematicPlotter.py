@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[138]:
+# In[1]:
 
 #import relevant libraries`
 import math
@@ -34,7 +34,7 @@ beast=True
 show=True
 
 
-# In[139]:
+# In[2]:
 
 # for use in batch mode
 if len(sys.argv) == 4:
@@ -43,9 +43,15 @@ if len(sys.argv) == 4:
     if int(sys.argv[2])==0:
         show=False
     imageType=sys.argv[3]
+    
+    
+if beast:
+    print "Generating beast style figures in "+imageType+" format"
+else:
+    print "Generating custom style figures in "+imageType+" format"
 
 
-# In[140]:
+# In[3]:
 
 #read the xml data into a pandas dataframe
 Data=[]
@@ -133,38 +139,7 @@ if show:
     print PScale
 
 
-# In[167]:
-
-
-
-#import matplotlib
-import matplotlib as mpl
-import matplotlib.mlab as mlab
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-
-
-#import the belle II style
-import belle2style_mpl
-style = belle2style_mpl.b2_style_mpl()  #style created by Michael Hedges to match BELLE II root style
-plt.style.use(style)
-
-#my colours
-HERColour = "#C92630"
-LERColour = "#3C7DC4"
-
-
-
-#the beast colours
-if beast:
-    HERColour = "#0000FF"
-    LERColour = "#FF0000"
-
-R = float(tuple(int(HERColour.lstrip('#')[i:i+2], 16) for i in (0, 2 ,4))[0])/255
-
-
-
-# In[168]:
+# In[4]:
 
 #the font I'm using doesn't have a character for ^-, so I have to redefine how the axis is labeled
 
@@ -182,7 +157,49 @@ def neglabeller(x,pos):
     
 
 
-# In[170]:
+# In[8]:
+
+
+
+#import matplotlib
+import matplotlib as mpl
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
+
+#import the belle II style
+import belle2style_mpl
+style = belle2style_mpl.b2_style_mpl()  #style created by Michael Hedges to match BELLE II root style
+plt.style.use(style)
+
+#my colours
+#HERColour = "#C92630"
+#LERColour = "#3C7DC4"
+
+HERColour = (201.0,  #R
+             38.0,   #G
+             48.0)   #B
+LERColour = (60.0,
+             125.0,
+             196.0)
+
+#the beast colours
+if beast:
+    HERColour = (0.0,
+                 0.0,
+                 255.0)
+    LERColour = (255.0,
+                 0.0,
+                 0.0)
+
+    
+HERColour = np.divide(HERColour, 255)
+LERColour = np.divide(LERColour, 255)    
+    
+
+
+# In[6]:
 
 
 #Plot Data/Sim for each detector
@@ -195,14 +212,14 @@ plt.figure(figsize=(800/80, 500/80))
 
 ax = plt.subplot(111)
         
-Hoffset=-0.1875
-Loffset=0.1875
+Hoffset=-0.1875*1.5
+Loffset=0.1875*1.5
     
 
 xlabel='$\mathcal{O}^{data}/\mathcal{O}^{sim}$'
 
         
-for beam in 'HER', 'LER':
+for beam in ['HER', 'LER']:
     
     HFrame=HERLER.loc[lambda df: (df.Beam == beam), :] 
     
@@ -216,9 +233,12 @@ for beam in 'HER', 'LER':
         m='o'
         o=Loffset
         
+    triplet = [int(i) for i in np.multiply(c, 255)]
+    hexC = '#'+''.join(map(chr, triplet)).encode('hex')     
+        
     #plot data
     #sns.stripplot(x="ratio", y="Detector", hue="Beam", data=AFrame, jitter=False, split=True, size=10, marker='o', edgecolor=['#FF0000','#0000FF'], linewidth=1)
-    sns.stripplot(HFrame.ratio, HFrame.Detector , jitter=False, size=15, marker=m,edgecolor=c, linewidth=1)
+    sns.stripplot(HFrame.ratio, HFrame.Detector , jitter=False, size=15, marker=m,edgecolor=hexC, linewidth=1)
   
     for y,ylabel in zip(ax.get_yticks(), ax.get_yticklabels()):
         f = HFrame['Detector'] == ylabel.get_text() 
@@ -238,16 +258,14 @@ for point in ax.collections:
     offsets=point.get_offsets()
     o=Loffset
     
-    if point.get_edgecolors()[0][0]==R:
+    eq=np.equal(point.get_edgecolors()[0][0:3], HERColour)
+    
+    if np.all(eq):
         o=Hoffset
        
-    
-        
     for i in range(0,len(offsets)):
         offsets[i][1] = offsets[i][1]+o
 
-            
-            
     point.set_offsets(offsets)
         
 
@@ -312,9 +330,9 @@ if show:
 
 
 
-# In[103]:
+# In[7]:
 
-
+noColor=True
 
 #Plot PScale for each detector
 
@@ -325,18 +343,33 @@ for beam in 'HER', 'LER':
     ax = plt.subplot(111)
     
     #select appropriate data from the data frame
-    Frame=PScale.loc[lambda df: (df.Beam == beam), :]
-        
+    Frame=PScale.loc[lambda df: (df.Beam == beam), :]        
     plt.setp(ax.get_xticklabels(), visible=True)
     
     ThisColour=HERColour
     if beam == 'LER':
         ThisColour=LERColour
         
+    c=HERColour
+    m='^'
+    o=Hoffset
+    if beam == 'LER':
+        c=LERColour
+        m='o'
+        o=Loffset
+            
+    triplet = [int(i) for i in np.multiply(c, 255)]
+
+    hexC = '#'+''.join(map(chr, triplet)).encode('hex')         
 
     #plot data
-    sns.stripplot(Frame.PScale, Frame.Detector , jitter=False, size=10, color='black', linewidth=0)
+    if noColor:
+        sns.stripplot(Frame.PScale, Frame.Detector , jitter=False, size=10, color='black', linewidth=1)
+        c=[0,0,0]
+    else:
+        sns.stripplot(Frame.PScale, Frame.Detector , jitter=False, size=10, marker=m, edgecolor=hexC, color='white', linewidth=1)
 
+    
     #add error abrs
     for y,ylabel in zip(ax.get_yticks(), ax.get_yticklabels()):
         f = Frame['Detector'] == ylabel.get_text() 
@@ -346,7 +379,7 @@ for beam in 'HER', 'LER':
                     #ls='none', 
                     elinewidth=2,
                     capthick=2,
-                    color='black')
+                    color=c)
 
     #set axis titles
     plt.ylabel(beam)
