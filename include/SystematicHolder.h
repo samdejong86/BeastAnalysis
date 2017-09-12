@@ -42,9 +42,10 @@ class SystematicHolder{
     for(int j=0; j<nCh; j++){
       if(badCh[j]) continue;
       if(badHER[j]&&badLER[j]) continue;
-      //out<<j<<endl;
+      out<<j<<endl;
       
       if(!badHER[j]){
+	
     out<<"HER Value: "<<ValueHER[j]<<endl;
     out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
     for(int i=0; i<(int)name.size(); i++)
@@ -55,7 +56,7 @@ class SystematicHolder{
       }
 
       if(!badLER[j]){
-
+	
     out<<"LER Value: "<<ValueLER[j]<<endl;
     out<<left<<setw(10)<<"Source"  <<right<<setw(12)<<"+error"<<right<<setw(14)<<"-error"<<endl;
     for(int i=0; i<(int)name.size(); i++)

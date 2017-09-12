@@ -67,7 +67,7 @@ class dataSimRatio{
       
       double ratio= dataSum/simSum;    
 
-      double errorRatio = RatioError(dataSum, simSum, errSumData, errSimSum);
+      double errorRatio = RatioError(dataSum, simSum, sqrt(errSumData), sqrt(errSimSum));
        
     
       if(Ring=="LER"){

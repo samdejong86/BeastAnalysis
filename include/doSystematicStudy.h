@@ -36,9 +36,9 @@ void doSystematicStudy(SystematicHolder &Systematics, vector<TouschekSolver> &so
        Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", true);
 
     }else if(q==2){//perturb pscale up
-      Params.setPScalePerturbation(PScaleLERErr);
+      Params.setPScalePerturbationLER(PScaleLERErr);
       Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", true);
-      Params.setPScalePerturbation(PScaleHERErr);
+      Params.setPScalePerturbationHER(PScaleHERErr);
       Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", true);
     }
   
@@ -96,9 +96,9 @@ void doSystematicStudy(SystematicHolder &Systematics, vector<TouschekSolver> &so
       
     }else if(q==2){
       Systematics.addSystematicDown("PScale", ratios);
-      Params.setPScalePerturbation(PScaleLERErr);
+      Params.setPScalePerturbationLER(PScaleLERErr);
       Params.PerturbedSimulate(LERfile, "rootFiles/LERtemp.root", false);
-      Params.setPScalePerturbation(PScaleHERErr);
+      Params.setPScalePerturbationHER(PScaleHERErr);
       Params.PerturbedSimulate(HERfile, "rootFiles/HERtemp.root", false);
     }
 
@@ -144,7 +144,8 @@ void doSystematicStudy(SystematicHolder &Systematics, vector<TouschekSolver> &so
       Params.setBeamSizePerturbation(0); 
     }else if(q==2){
       Systematics.addSystematicUp("PScale", ratios);
-      Params.setPScalePerturbation(0);
+      Params.setPScalePerturbationHER(0);
+      Params.setPScalePerturbationLER(0);
     }
 
     //delete temporary files

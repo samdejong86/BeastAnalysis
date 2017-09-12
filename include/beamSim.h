@@ -38,7 +38,8 @@ class beamSim{
   //for running a perturbed simulation
   void setCurrentPerturbation(double perturbation){ currentPerturb=perturbation;}
   void setBeamSizePerturbation(double perturbation){ beamSizePerturb=perturbation;}
-  void setPScalePerturbation(double perturbation){ PScalePerturb=perturbation;}
+  void setPScalePerturbationHER(double perturbation){ PScalePerturbHER=perturbation;}
+  void setPScalePerturbationLER(double perturbation){ PScalePerturbLER=perturbation;}
 
   //get methods
   vector<double> getLT(){return ParamLT;}
@@ -71,7 +72,8 @@ class beamSim{
 
   double currentPerturb;
   double beamSizePerturb;
-  double PScalePerturb;
+  double PScalePerturbHER;
+  double PScalePerturbLER;
   
 };
  #endif

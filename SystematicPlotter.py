@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[97]:
+# In[138]:
 
 #import relevant libraries`
 import math
@@ -34,7 +34,7 @@ beast=True
 show=True
 
 
-# In[98]:
+# In[139]:
 
 # for use in batch mode
 if len(sys.argv) == 4:
@@ -45,7 +45,7 @@ if len(sys.argv) == 4:
     imageType=sys.argv[3]
 
 
-# In[137]:
+# In[140]:
 
 #read the xml data into a pandas dataframe
 Data=[]
@@ -133,7 +133,7 @@ if show:
     print PScale
 
 
-# In[100]:
+# In[167]:
 
 
 
@@ -153,15 +153,18 @@ plt.style.use(style)
 HERColour = "#C92630"
 LERColour = "#3C7DC4"
 
+
+
 #the beast colours
 if beast:
     HERColour = "#0000FF"
     LERColour = "#FF0000"
 
+R = float(tuple(int(HERColour.lstrip('#')[i:i+2], 16) for i in (0, 2 ,4))[0])/255
 
 
 
-# In[134]:
+# In[168]:
 
 #the font I'm using doesn't have a character for ^-, so I have to redefine how the axis is labeled
 
@@ -179,7 +182,7 @@ def neglabeller(x,pos):
     
 
 
-# In[135]:
+# In[170]:
 
 
 #Plot Data/Sim for each detector
@@ -235,7 +238,7 @@ for point in ax.collections:
     offsets=point.get_offsets()
     o=Loffset
     
-    if point.get_edgecolors()[0][0]<0.5:
+    if point.get_edgecolors()[0][0]==R:
         o=Hoffset
        
     

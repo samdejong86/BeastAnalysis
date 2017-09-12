@@ -22,7 +22,8 @@ beamSim::beamSim(const beamSim &obj){
   
   this->currentPerturb = obj.currentPerturb;
   this->beamSizePerturb = obj.beamSizePerturb;
-  this->PScalePerturb = obj.PScalePerturb;
+  this->PScalePerturbHER = obj.PScalePerturbHER;
+  this->PScalePerturbLER = obj.PScalePerturbLER;
 
   
   this->PressureScaleLER=obj.PressureScaleLER;
@@ -77,7 +78,8 @@ beamSim::beamSim(TString file, TString DataBranch, int nCh){
     }*/
   currentPerturb=0;
   beamSizePerturb=0;
-  PScalePerturb=0;
+  PScalePerturbHER=0;
+  PScalePerturbLER=0;
 
 }
 
@@ -184,9 +186,8 @@ void beamSim::getSimBeamPars(){
     }
   }
 
-  for(int i=0; i<nChannels; i++){
-    cout<<ParamLT[i]<<"\t"<<ParamHT[i]<<endl;
-  }
+  //for(int i=0; i<nChannels; i++) cout<<ParamLT[i]<<"\t"<<ParamHT[i]<<endl;
+  
   
   //close the truth file.
   f->Close();
@@ -342,7 +343,8 @@ void beamSim::PerturbedSimulate(TString inputFile, TString outfilename, bool pos
 
   double currentScale = direction*currentPerturb;
   double beamsizeScale = 1+direction*beamSizePerturb;
-  double pscaleScale = direction*PScalePerturb;
+  double pscaleScaleHER = direction*PScalePerturbHER;
+  double pscaleScaleLER = direction*PScalePerturbLER;
 
    
   TFile *f = new TFile(inputFile);
@@ -432,8 +434,8 @@ void beamSim::PerturbedSimulate(TString inputFile, TString outfilename, bool pos
 	  if(k==1) ZL = zefLER2->at(0);
 	  if(k==5) ZL = zefLER6->at(0);
 	  
-	  LBG += ParamLBGall.at(j)[k]*LERCUR*(PressureScaleLER+pscaleScale)*presLER->at(k)*ZL*ZL;
-	  HBG += ParamHBGall.at(j)[k]*HERCUR*(PressureScaleHER+pscaleScale)*presHER->at(k)*zefHER*zefHER;
+	  LBG += ParamLBGall.at(j)[k]*LERCUR*(PressureScaleLER+pscaleScaleLER)*presLER->at(k)*ZL*ZL;
+	  HBG += ParamHBGall.at(j)[k]*HERCUR*(PressureScaleHER+pscaleScaleHER)*presHER->at(k)*zefHER*zefHER;
 	}
 	
 	double simRate = LBG+HBG+
@@ -447,6 +449,7 @@ void beamSim::PerturbedSimulate(TString inputFile, TString outfilename, bool pos
       
     }
     
+    //cout<<PressureScaleLER+pscaleScaleLER<<" "<<PressureScaleLER<<" "<<pscaleScaleLER<<endl;
     
     outtree->Write();
     oFile->Close();
