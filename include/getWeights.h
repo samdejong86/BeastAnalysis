@@ -18,8 +18,6 @@ double getWeights(vector<TouschekSolver> data, vector<TouschekSolver> Sim, doubl
   double meanDen = 0.0;
   double M2Den = 0.0;
 
-  int ch=0;
-
   double fitErrorNum=0;
   double fitErrorDen=0;
     
@@ -34,7 +32,7 @@ double getWeights(vector<TouschekSolver> data, vector<TouschekSolver> Sim, doubl
     double simBG = Sim[i].getBGFitParameters();
     double simTous = Sim[i].getTousFitParameters();
       
-
+    //fitting errors
     double dataBGError = data[i].getBGError();
     double dataTousError = data[i].getTousError();
     double simBGError = Sim[i].getBGError();
@@ -43,12 +41,13 @@ double getWeights(vector<TouschekSolver> data, vector<TouschekSolver> Sim, doubl
     double x = dataBG/dataTous;
     double y = simBG/simTous;
 
+    //error on the numerator and denominator from the fits
     fitErrorNum+= pow(RatioError(dataBG,dataTous, dataBGError, dataTousError),2);
     fitErrorDen+= pow(RatioError(simBG,simTous,simBGError,simTousError),2);
 
     
-
-
+    
+    //standard deviation of numerator and denominator (stat error)
     n+=1;
     double deltaNum = x-meanNum;
     meanNum += deltaNum/n;
@@ -60,8 +59,8 @@ double getWeights(vector<TouschekSolver> data, vector<TouschekSolver> Sim, doubl
     double delta2Den = y-meanDen;
     M2Den=deltaDen*delta2Den;
 
-    WeightNum+=dataBG/dataTous;
-    WeightDenom+=simBG/simTous;
+    WeightNum+=x;
+    WeightDenom+=y;
   }
   
   
@@ -78,9 +77,11 @@ double getWeights(vector<TouschekSolver> data, vector<TouschekSolver> Sim, doubl
     
     }*/
 
+  //combine stat and fit errors
   double numError = numErrorSq+fitErrorNum;
   double denError = denErrorSq+fitErrorDen;
   
+  //if there's only one channel, don't use stat error (since there will be a divide by 0 error)
   if(n==1){
     numError = fitErrorNum;
     denError = fitErrorDen;
