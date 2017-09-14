@@ -19,6 +19,9 @@ double getWeights(vector<TouschekSolver> data, vector<TouschekSolver> Sim, doubl
   double M2Den = 0.0;
 
   int ch=0;
+
+  double fitErrorNum=0;
+  double fitErrorDen=0;
     
   for(int i=0; i<(int)data.size(); i++){
     if(badCh[i]) continue;
@@ -31,8 +34,20 @@ double getWeights(vector<TouschekSolver> data, vector<TouschekSolver> Sim, doubl
     double simBG = Sim[i].getBGFitParameters();
     double simTous = Sim[i].getTousFitParameters();
       
+
+    double dataBGError = data[i].getBGError();
+    double dataTousError = data[i].getTousError();
+    double simBGError = Sim[i].getBGError();
+    double simTousError = Sim[i].getTousError();
+
     double x = dataBG/dataTous;
     double y = simBG/simTous;
+
+    fitErrorNum+= pow(RatioError(dataBG,dataTous, dataBGError, dataTousError),2);
+    fitErrorDen+= pow(RatioError(simBG,simTous,simBGError,simTousError),2);
+
+    
+
 
     n+=1;
     double deltaNum = x-meanNum;
@@ -54,17 +69,25 @@ double getWeights(vector<TouschekSolver> data, vector<TouschekSolver> Sim, doubl
   double numErrorSq=M2Num/(n-1);
   double denErrorSq=M2Den/(n-1);
 
-
+  /*
   if(n==1){
     
     numErrorSq = pow(RatioError(data[ch].getBGFitParameters(), data[ch].getTousFitParameters(), data[ch].getBGError(), data[ch].getTousError()),2);
     denErrorSq = pow(RatioError(Sim[ch].getBGFitParameters(), Sim[ch].getTousFitParameters(), Sim[ch].getBGError(), Sim[ch].getTousError()),2);
 
     
+    }*/
+
+  double numError = numErrorSq+fitErrorNum;
+  double denError = denErrorSq+fitErrorDen;
+  
+  if(n==1){
+    numError = fitErrorNum;
+    denError = fitErrorDen;
   }
 
 
-  error = sqrt(numErrorSq/(WeightDenom*WeightDenom) + denErrorSq*WeightNum*WeightNum/( WeightDenom*WeightDenom*WeightDenom*WeightDenom));
+  error = RatioError(WeightNum, WeightDenom, sqrt(numError), sqrt(denError));
     
   
   return WeightNum/WeightDenom;
