@@ -157,7 +157,7 @@ def neglabeller(x,pos):
     
 
 
-# In[8]:
+# In[5]:
 
 
 
@@ -199,7 +199,7 @@ LERColour = np.divide(LERColour, 255)
     
 
 
-# In[6]:
+# In[7]:
 
 
 #Plot Data/Sim for each detector
@@ -216,7 +216,7 @@ Hoffset=-0.1875*1.5
 Loffset=0.1875*1.5
     
 
-xlabel='$\mathcal{O}^{data}/\mathcal{O}^{sim}$'
+xlabel='$\mathcal{O}_{data}/\mathcal{O}_{sim}$'
 
         
 for beam in ['HER', 'LER']:
@@ -279,7 +279,7 @@ plt.xlabel(xlabel, horizontalalignment='right', x=1.0)
 #set log scale on x
 ax.set_xscale("log", nonposx='clip')
 
-ax.set_xlim(0.01, 1e9)
+ax.set_xlim(0.001, 1e7)
 ax.set_ylim(10.75, -0.75)
         
 #set ticks pointing in
@@ -330,7 +330,7 @@ if show:
 
 
 
-# In[7]:
+# In[8]:
 
 noColor=True
 
@@ -382,7 +382,7 @@ for beam in 'HER', 'LER':
                     color=c)
 
     #set axis titles
-    plt.ylabel(beam)
+    plt.ylabel("")
     xlab = "$P_{Scale}$"
     if beam == 'HER':
         xlab = xlab+"$Z_{e}^{2}$"

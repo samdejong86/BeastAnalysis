@@ -90,7 +90,7 @@ TString beamSim::getSimBranchName(){
   }else if(DataBranchName.Contains("BGO")){
     return "BGO_dose";
   }else if(DataBranchName.Contains("CSI")){
-    return "CSI_dose";
+    return "CSI_rate";
   }else if(DataBranchName.Contains("DIA")){
     return "DIA_dose";
   }else if(DataBranchName.Contains("CLW")){
